@@ -31,7 +31,7 @@ filtersContainer.insertAdjacentHTML(`beforeend`, getTripFilterHTML(filters));
 
 const getPointsArray = (count = 7) => {
   const start = Date.now();
-  const res = Array.from({length: count}).map(getTrip);
+  const res = Array.from({length: count}, getTrip);
 
   // Добавляем в объект два свойства dateBegin, dateEnd
 
