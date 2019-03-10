@@ -1,8 +1,9 @@
 import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY} from "./const";
-import {createElement} from './utils';
+import Component from './component';
 
-export default class Event {
+export default class Event extends Component {
   constructor(data) {
+    super();
     this._type = data.type;
     this._title = data.title;
     this._offers = data.offers;
@@ -10,7 +11,6 @@ export default class Event {
     this._dateBegin = data.dateBegin;
     this._dateEnd = data.dateEnd;
 
-    this._element = null;
     this._onEdit = null;
     this._onEditButtonClickBound = this._onEditButtonClick.bind(this);
   }
@@ -53,10 +53,6 @@ export default class Event {
     return typeof this._onEdit === `function` && this._onEdit();
   }
 
-  get element() {
-    return this._element;
-  }
-
   set onEdit(fn) {
     this._onEdit = fn;
   }
@@ -82,17 +78,7 @@ export default class Event {
     this._element.addEventListener(`click`, this._onEditButtonClickBound);
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
   unbind() {
     this._element.removeEventListener(`click`, this._onEditButtonClickBound);
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 }

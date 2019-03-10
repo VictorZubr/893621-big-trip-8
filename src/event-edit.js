@@ -1,8 +1,9 @@
 import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY, ADDITIONAL_POINTS} from "./const";
-import {createElement} from './utils';
+import Componenet from './component';
 
-export default class EventEdit {
+export default class EventEdit extends Componenet {
   constructor(data) {
+    super();
     this._type = data.type;
     this._title = data.title;
     this._tripRoute = data.tripRoute;
@@ -14,7 +15,6 @@ export default class EventEdit {
     this._dateBegin = data.dateBegin;
     this._dateEnd = data.dateEnd;
 
-    this._element = null;
     this._formElement = null;
     this._onSubmit = null;
     this._onReset = null;
@@ -75,10 +75,6 @@ export default class EventEdit {
   _onFormReset(evt) {
     evt.preventDefault();
     return typeof this._onReset === `function` && this._onReset();
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onSubmit(fn) {
@@ -188,19 +184,8 @@ export default class EventEdit {
     this._formElement.addEventListener(`reset`, this._onFormResetBound);
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
   unbind() {
     this._formElement.removeEventListener(`submit`, this._onFormSubmitBound);
     this._formElement.removeEventListener(`reset`, this._onFormResetBound);
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 }
