@@ -18,7 +18,7 @@ export default class EventEdit {
     this._formElement = null;
     this._onSubmit = null;
     this._onReset = null;
-    this._onFormSunmitBound = this._onFormSubmit.bind(this);
+    this._onFormSubmitBound = this._onFormSubmit.bind(this);
     this._onFormResetBound = this._onFormReset.bind(this);
   }
 
@@ -71,6 +71,7 @@ export default class EventEdit {
     evt.preventDefault();
     return typeof this._onSubmit === `function` && this._onSubmit();
   }
+
   _onFormReset(evt) {
     evt.preventDefault();
     return typeof this._onReset === `function` && this._onReset();
@@ -172,11 +173,6 @@ export default class EventEdit {
         <p class="point__destination-text">${this._destination}</p>
         <div class="point__destination-images">
             ${this._getDescriptionHTML()}
-<!--          <img src="http://picsum.photos/330/140?r=123" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/300/200?r=1234" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/300/100?r=12345" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/200/300?r=123456" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/100/300?r=1234567" alt="picture from place" class="point__destination-image">-->
         </div>
       </section>
       <input type="hidden" class="point__total-price" name="total-price" value="">
@@ -188,7 +184,7 @@ export default class EventEdit {
 
   bind() {
     this._formElement = this._element.querySelector(`form`);
-    this._formElement.addEventListener(`submit`, this._onFormSunmitBound);
+    this._formElement.addEventListener(`submit`, this._onFormSubmitBound);
     this._formElement.addEventListener(`reset`, this._onFormResetBound);
   }
 
@@ -197,8 +193,9 @@ export default class EventEdit {
     this.bind();
     return this._element;
   }
+
   unbind() {
-    this._formElement.removeEventListener(`submit`, this._onFormSunmitBound);
+    this._formElement.removeEventListener(`submit`, this._onFormSubmitBound);
     this._formElement.removeEventListener(`reset`, this._onFormResetBound);
   }
 
