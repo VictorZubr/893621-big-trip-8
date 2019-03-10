@@ -1,10 +1,10 @@
 import {getRandomInteger} from "./utils";
 import getFilterTemplate from './make-filter';
-import getTripHeaderHTML from './make-trip-header';
 import getPoint from './get-trip-point';
 import {MILLISECONDS_IN_DAY, HOURS, MINUTES} from "./const";
 import Event from './event';
 import EventEdit from './event-edit';
+import TripHeader from "./trip-header";
 
 const filters = [
   {
@@ -61,56 +61,65 @@ const getTrip = (count = 7) => {
   };
 };
 
-const renderEvents = (events, container) => events.map((element) => {
-  const event = new Event(element);
+const getTripComponents = (tripData, container) => {
+  const header = new TripHeader(tripData);
+  const events = tripData.events.map((element) => {
+    const event = new Event(element);
+    const eventEdit = new EventEdit(element);
+    event.onEdit = () => {
+      eventEdit.render();
+      container.replaceChild(eventEdit.element, event.element);
+      event.unrender();
+    };
+    eventEdit.onSubmit = () => {
+      event.render();
+      container.replaceChild(event.element, eventEdit.element);
+      eventEdit.unrender();
+    };
+    eventEdit.onReset = () => {
+      event.render();
+      container.replaceChild(event.element, eventEdit.element);
+      eventEdit.unrender();
+    };
+    return [event, eventEdit];
+  });
+  return {header, events};
+};
 
-  const eventEdit = new EventEdit(element);
-  event.onEdit = () => {
-    eventEdit.render();
-    container.replaceChild(eventEdit.element, event.element);
+const unrenderEvents = (events, container) => events.forEach(([event, eventEdit]) => {
+  if (event.element) {
+    container.removeChild(event.element);
     event.unrender();
-  };
-  eventEdit.onSubmit = () => {
-    event.render();
-    container.replaceChild(event.element, eventEdit.element);
+  }
+  if (eventEdit.element) {
+    container.removeChild(eventEdit.element);
     eventEdit.unrender();
-  };
-  eventEdit.onReset = () => {
-    event.render();
-    container.replaceChild(event.element, eventEdit.element);
-    eventEdit.unrender();
-  };
-
-  container.appendChild(event.render());
-  return event;
-});
-
-const unrenderEvents = (events, container) => events.forEach((item) => {
-  if (item.element) {
-    container.removeChild(item.element);
-    item.unrender();
   }
 });
 
 const renderTrip = (trip, headerContainer, eventsContainer) => {
-  headerContainer.insertAdjacentHTML(`afterBegin`, getTripHeaderHTML(trip));
-  return renderEvents(trip.events, eventsContainer);
+  const nextSiblingElement = headerContainer.querySelector(`section.trip-controls`);
+  headerContainer.insertBefore(trip.header.render(), nextSiblingElement);
+  trip.events.forEach(([event]) => eventsContainer.appendChild(event.render()));
 };
 
-const unrenderTrip = (headerContainer, eventsContainer) => {
-  const deletedElement = headerContainer.querySelector(`:first-child`);
-  headerContainer.removeChild(deletedElement);
-  unrenderEvents(events, eventsContainer);
+const unrenderTrip = (trip, headerContainer, eventsContainer) => {
+  if (trip.header.element) {
+    headerContainer.removeChild(trip.header.element);
+    trip.header.unrender();
+  }
+  unrenderEvents(trip.events, eventsContainer);
 };
 
 const tripHeaderContainer = document.querySelector(`.header__wrap`);
 const tripDayContainer = document.querySelector(`.trip-day__items`);
-
-let events = renderTrip(getTrip(), tripHeaderContainer, tripDayContainer);
+let trip = getTripComponents(getTrip(), tripDayContainer);
+renderTrip(trip, tripHeaderContainer, tripDayContainer);
 
 const filterElements = filtersContainer.querySelectorAll(`input`);
 
 filterElements.forEach((element) => element.addEventListener(`click`, () => {
-  unrenderTrip(tripHeaderContainer, tripDayContainer);
-  events = renderTrip(getTrip(getRandomInteger(1, 20)), tripHeaderContainer, tripDayContainer);
+  unrenderTrip(trip, tripHeaderContainer, tripDayContainer);
+  trip = getTripComponents(getTrip(getRandomInteger(1, 20)), tripDayContainer);
+  renderTrip(trip, tripHeaderContainer, tripDayContainer);
 }));
