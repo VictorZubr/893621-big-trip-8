@@ -18,3 +18,11 @@ export const getRandomItems = (arr, count) => {
 // Функция фозвращает случайным образом true или false, с учетом коэффициента
 
 export const getTrueOrFalse = (factor = 0.5) => ((Math.random() - 1 + factor) > 0);
+
+// Функция возвращает элемент разметки из шаблона
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};

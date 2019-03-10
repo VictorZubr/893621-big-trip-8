@@ -4,17 +4,18 @@ export const MINUTES = 60;
 export const MILLISECONDS_IN_MINUTE = 60 * 1000;
 export const MILLISECONDS_IN_HOUR = 60 * MILLISECONDS_IN_MINUTE;
 export const MILLISECONDS_IN_DAY = 24 * MILLISECONDS_IN_HOUR;
+export const ADDITIONAL_POINTS = [`airport`, `hotel`];
 
 export const POINT_TYPES = [
-  {name: `Taxi`, icon: `🚕`},
-  {name: `Bus`, icon: `🚌`},
-  {name: `Train`, icon: `🚂`},
-  {name: `Ship`, icon: `🛳`},
-  {name: `Transport`, icon: `🚊`},
-  {name: `Drive`, icon: `🚗`},
-  {name: `Flight`, icon: `✈`},
-  {name: `Check-in`, icon: `🏨`},
-  {name: `Sightseeing`, icon: `🏛`},
+  {name: `Taxi to`, icon: `🚕`},
+  {name: `Bus to`, icon: `🚌`},
+  {name: `Train to`, icon: `🚂`},
+  {name: `Ship to`, icon: `🛳️`},
+  {name: `Transport to`, icon: `🚊`},
+  {name: `Drive to`, icon: `🚗`},
+  {name: `Flight to`, icon: `✈️`},
+  {name: `Check-in to`, icon: `🏨`},
+  {name: `Sightseeing`, icon: `🏛️`},
   {name: `Restaurant`, icon: `🍴`}
 ];
 
