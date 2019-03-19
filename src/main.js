@@ -63,9 +63,11 @@ const getTrip = (count = 7) => {
 
 const getTripComponents = (tripData, container) => {
   const header = new TripHeader(tripData);
-  const events = tripData.events.map((element) => {
+  const events = tripData.events.map((element, index) => {
     const event = new Event(element);
     const eventEdit = new EventEdit(element);
+    event.index = index;
+    eventEdit.index = index;
     event.onEdit = () => {
       eventEdit.render();
       container.replaceChild(eventEdit.element, event.element);
