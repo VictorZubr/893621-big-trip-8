@@ -63,19 +63,24 @@ const getTrip = (count = 7) => {
 
 const getTripComponents = (tripData, container) => {
   const header = new TripHeader(tripData);
-  const events = tripData.events.map((element) => {
+  const events = tripData.events.map((element, index) => {
     const event = new Event(element);
     const eventEdit = new EventEdit(element);
+    event.index = index;
+    eventEdit.index = index;
     event.onEdit = () => {
       eventEdit.render();
       container.replaceChild(eventEdit.element, event.element);
       event.unrender();
     };
-    eventEdit.onSubmit = () => {
+    eventEdit.onSubmit = (newObject) => {
+      Object.assign(element, newObject);
+      event.update(element);
       event.render();
       container.replaceChild(event.element, eventEdit.element);
       eventEdit.unrender();
     };
+
     eventEdit.onReset = () => {
       event.render();
       container.replaceChild(event.element, eventEdit.element);

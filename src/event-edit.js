@@ -1,5 +1,6 @@
-import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY, ADDITIONAL_POINTS} from "./const";
+import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY, ADDITIONAL_POINTS, POINT_TYPES} from "./const";
 import Componenet from './component';
+import moment from 'moment';
 
 export default class EventEdit extends Componenet {
   constructor(data) {
@@ -15,11 +16,16 @@ export default class EventEdit extends Componenet {
     this._dateBegin = data.dateBegin;
     this._dateEnd = data.dateEnd;
 
+    this._index = null;
+
     this._formElement = null;
+    this._travelWayToggleElement = null;
+
     this._onSubmit = null;
     this._onReset = null;
     this._onFormSubmitBound = this._onFormSubmit.bind(this);
     this._onFormResetBound = this._onFormReset.bind(this);
+    this._onFormChangeBound = this._onFormChange.bind(this);
   }
 
   _getDuration(ms) {
@@ -44,19 +50,18 @@ export default class EventEdit extends Componenet {
       `${this._getFormattedTime(this._dateBegin)}&nbsp;&mdash; ${this._getFormattedTime(this._dateEnd)}`;
   }
 
-  _getOfferId(offer) {
+  _getOfferValue(offer) {
     return offer.toLowerCase().replace(/\s/g, `-`);
   }
 
   _getOffersHTML() {
     return this._offers
       .map((element) =>
-        `          <input class="point__offers-input visually-hidden" type="checkbox" id="${this._getOfferId(element.name)}" name="offer" value="add-luggage">
-          <label for="${this._getOfferId(element.name)}" class="point__offers-label">
+        ` <input class="point__offers-input visually-hidden" type="checkbox" id="${this._getOfferValue(element.name)}-${this._index}" name="offer" value="${this._getOfferValue(element.name)}"${element.checked ? ` checked` : ``}>
+          <label for="${this._getOfferValue(element.name)}-${this._index}" class="point__offers-label">
             <span class="point__offer-service">${element.name}</span> + €<span class="point__offer-price">${element.price}</span>
           </label>`)
       .join(``);
-
   }
 
   _getDestinationsHTML() {
@@ -67,22 +72,20 @@ export default class EventEdit extends Componenet {
     return Array.from(this._photos).map((element) => `<img src="${element}" alt="picture from place" class="point__destination-image">`).join(``);
   }
 
-  _onFormSubmit(evt) {
-    evt.preventDefault();
-    return typeof this._onSubmit === `function` && this._onSubmit();
-  }
-
-  _onFormReset(evt) {
-    evt.preventDefault();
-    return typeof this._onReset === `function` && this._onReset();
-  }
-
-  set onSubmit(fn) {
-    this._onSubmit = fn;
-  }
-
-  set onReset(fn) {
-    this._onReset = fn;
+  _getTravelWaySelectHTML() {
+    const result = POINT_TYPES.sort((a, b) => a.group < b.group);
+    result.forEach((element, index, array) => {
+      element.oldGroup = index === 0 || element.group === array[index - 1].group;
+    });
+    return result.map((element) =>
+      `${!element.oldGroup ? `</div><div class="travel-way__select-group">` : ``}
+       <input class="travel-way__select-input visually-hidden"
+            type="radio"
+            id="travel-way-${element.name}-${this._index}"
+            name="travel-way"
+            value="${element.name}">
+       <label class="travel-way__select-label" for="travel-way-${element.name}-${this._index}">${element.icon} ${element.name}</label>`
+    ).join(``);
   }
 
   get template() {
@@ -95,37 +98,19 @@ export default class EventEdit extends Componenet {
       </label>
 
       <div class="travel-way">
-        <label class="travel-way__label" for="travel-way__toggle">${this._type.icon}️</label>
+        <label class="travel-way__label" for="travel-way__toggle-${this._index}">${this._type.icon}</label>
 
-        <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle">
+        <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle-${this._index}">
 
         <div class="travel-way__select">
           <div class="travel-way__select-group">
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-taxi" name="travel-way" value="taxi">
-            <label class="travel-way__select-label" for="travel-way-taxi">🚕 taxi</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-bus" name="travel-way" value="bus">
-            <label class="travel-way__select-label" for="travel-way-bus">🚌 bus</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-train" name="travel-way" value="train">
-            <label class="travel-way__select-label" for="travel-way-train">🚂 train</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="train" checked>
-            <label class="travel-way__select-label" for="travel-way-flight">✈️ flight</label>
-          </div>
-
-          <div class="travel-way__select-group">
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-check-in" name="travel-way" value="check-in">
-            <label class="travel-way__select-label" for="travel-way-check-in">🏨 check-in</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sight-seeing">
-            <label class="travel-way__select-label" for="travel-way-sightseeing">🏛 sightseeing</label>
+            ${this._getTravelWaySelectHTML()}
           </div>
         </div>
       </div>
 
       <div class="point__destination-wrap">
-        <label class="point__destination-label" for="destination">${this._type.name}</label>
+        <label class="point__destination-label" for="destination">${this._type.text}</label>
         <input class="point__destination-input" list="destination-select" id="destination" value="${this._title}" name="destination">
         <datalist id="destination-select">
             ${this._getDestinationsHTML()}
@@ -178,14 +163,122 @@ export default class EventEdit extends Componenet {
 `;
   }
 
+  _onFormChange(evt) {
+    if (evt.target.name === `travel-way`) {
+      this._type = POINT_TYPES.find((element) => element.name === evt.target.value);
+      this._formElement.querySelector(`.point__destination-label`).innerText = this._type.text;
+      this._formElement.querySelector(`.travel-way__label`).innerText = this._type.icon;
+      this._travelWayToggleElement.click();
+    }
+  }
+
+  _processForm(formData) {
+    const entry = {
+      title: ``,
+      offers: this._offers.map((element) => {
+        element.checked = false;
+        return element;
+      }),
+      price: 0,
+      isFavorite: false,
+      dateBegin: 0,
+      dateEnd: 0
+    };
+
+    const eventEditMapper = this._createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (eventEditMapper[property]) {
+        eventEditMapper[property](value);
+      }
+    }
+    return entry;
+  }
+
+  _onFormSubmit(evt) {
+    evt.preventDefault();
+    const formData = new FormData(this._formElement);
+
+    const newData = this._processForm(formData);
+
+    [newData.dateBegin, newData.dateEnd] = [newData.dateBegin, newData.dateEnd]
+      .map((element) => (!moment(element).isValid() || element === 0 || typeof element === `undefined`) ? Date.now() : element);
+
+    if (typeof newData.type === `undefined`) {
+      newData.type = this._type;
+    }
+
+    this.update(newData);
+    return typeof this._onSubmit === `function` && this._onSubmit(newData);
+  }
+
+  _onFormReset(evt) {
+    evt.preventDefault();
+    return typeof this._onReset === `function` && this._onReset();
+  }
+
+  set onSubmit(fn) {
+    this._onSubmit = fn;
+  }
+
+  set onReset(fn) {
+    this._onReset = fn;
+  }
+
+  set index(num) {
+    this._index = num;
+  }
+
   bind() {
     this._formElement = this._element.querySelector(`form`);
     this._formElement.addEventListener(`submit`, this._onFormSubmitBound);
     this._formElement.addEventListener(`reset`, this._onFormResetBound);
+    this._formElement.addEventListener(`change`, this._onFormChangeBound);
+
+    this._travelWayToggleElement = this._formElement.querySelector(`#travel-way__toggle-${this._index}`);
   }
 
   unbind() {
     this._formElement.removeEventListener(`submit`, this._onFormSubmitBound);
     this._formElement.removeEventListener(`reset`, this._onFormResetBound);
+    this._formElement.removeEventListener(`change`, this._onFormChangeBound);
+    this._formElement = null;
+  }
+
+  update(data) {
+    this._type = data.type;
+    this._title = data.title;
+    this._offers = data.offers;
+    this._price = data.price;
+    this._isFavorite = data.isFavorite;
+    this._dateBegin = data.dateBegin;
+    this._dateEnd = data.dateEnd;
+  }
+
+  _createMapper(target) {
+    return {
+      'travel-way': (value) => {
+        target.type = POINT_TYPES.find((element) => element.name === value);
+      },
+      'destination': (value) => {
+        target.title = value;
+      },
+      'time': (value) => {
+        const values = value.split(`—`);
+        [target.dateBegin, target.dateEnd] = values.map((element) => +moment(element, `hh:mm a`));
+      },
+      'price': (value) => {
+        target.price = value;
+      },
+      'favorite': (value) => {
+        target.isFavorite = value === `on`;
+      },
+      'offer': (value) => {
+        target.offers.forEach((element) => {
+          element.checked = element.checked || element.name.split(` `).join(`-`).toLowerCase() === value;
+        });
+      },
+    };
   }
 }

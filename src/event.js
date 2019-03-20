@@ -11,6 +11,7 @@ export default class Event extends Component {
     this._dateBegin = data.dateBegin;
     this._dateEnd = data.dateEnd;
 
+    this._index = null;
     this._onEdit = null;
     this._onEditButtonClickBound = this._onEditButtonClick.bind(this);
   }
@@ -45,7 +46,7 @@ export default class Event extends Component {
 
   _getOffersHTML() {
     return this._offers
-      .map((element) => `<li><button class="trip-point__offer">${element.name} +&euro;&nbsp;${element.price}</button></li>`)
+      .map((element) => element.checked ? `<li><button class="trip-point__offer">${element.name} +&euro;&nbsp;${element.price}</button></li>` : ``)
       .join(``);
   }
 
@@ -55,6 +56,10 @@ export default class Event extends Component {
 
   set onEdit(fn) {
     this._onEdit = fn;
+  }
+
+  set index(num) {
+    this._index = num;
   }
 
   get template() {
@@ -80,5 +85,15 @@ export default class Event extends Component {
 
   unbind() {
     this._element.removeEventListener(`click`, this._onEditButtonClickBound);
+  }
+
+  update(data) {
+    this._type = data.type;
+    this._title = data.title;
+    this._offers = data.offers;
+    this._price = data.price;
+    this._isFavorite = data.isFavorite;
+    this._dateBegin = data.dateBegin;
+    this._dateEnd = data.dateEnd;
   }
 }

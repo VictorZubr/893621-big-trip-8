@@ -7,16 +7,16 @@ export const MILLISECONDS_IN_DAY = 24 * MILLISECONDS_IN_HOUR;
 export const ADDITIONAL_POINTS = [`airport`, `hotel`];
 
 export const POINT_TYPES = [
-  {name: `Taxi to`, icon: `🚕`},
-  {name: `Bus to`, icon: `🚌`},
-  {name: `Train to`, icon: `🚂`},
-  {name: `Ship to`, icon: `🛳️`},
-  {name: `Transport to`, icon: `🚊`},
-  {name: `Drive to`, icon: `🚗`},
-  {name: `Flight to`, icon: `✈️`},
-  {name: `Check-in to`, icon: `🏨`},
-  {name: `Sightseeing`, icon: `🏛️`},
-  {name: `Restaurant`, icon: `🍴`}
+  {name: `taxi`, icon: `🚕`, text: `Taxi to`, group: 1},
+  {name: `bus`, icon: `🚌`, text: `Bus to`, group: 1},
+  {name: `train`, icon: `🚂`, text: `Train to`, group: 1},
+  {name: `ship`, icon: `🛳️`, text: `Ship to`, group: 1},
+  {name: `transport`, icon: `🚊`, text: `Transport to`, group: 1},
+  {name: `drive to`, icon: `🚗`, text: `Drive to`, group: 1},
+  {name: `flight`, icon: `✈️`, text: `Flight to`, group: 1},
+  {name: `check-in`, icon: `🏨`, text: `Check-in to`, group: 2},
+  {name: `sight-seeing`, icon: `🏛️`, text: `Sightseeing`, group: 2},
+  {name: `restaurant`, icon: `🍴`, text: `Restaurant`, group: 2}
 ];
 
 export const OFFERS = [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`];
