@@ -73,11 +73,14 @@ const getTripComponents = (tripData, container) => {
       container.replaceChild(eventEdit.element, event.element);
       event.unrender();
     };
-    eventEdit.onSubmit = () => {
+    eventEdit.onSubmit = (newObject) => {
+      Object.assign(element, newObject);
+      event.update(element);
       event.render();
       container.replaceChild(event.element, eventEdit.element);
       eventEdit.unrender();
     };
+
     eventEdit.onReset = () => {
       event.render();
       container.replaceChild(event.element, eventEdit.element);

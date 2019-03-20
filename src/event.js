@@ -86,4 +86,14 @@ export default class Event extends Component {
   unbind() {
     this._element.removeEventListener(`click`, this._onEditButtonClickBound);
   }
+
+  update(data) {
+    this._type = data.type;
+    this._title = data.title;
+    this._offers = data.offers;
+    this._price = data.price;
+    this._isFavorite = data.isFavorite;
+    this._dateBegin = data.dateBegin;
+    this._dateEnd = data.dateEnd;
+  }
 }

@@ -1,6 +1,6 @@
 import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY, ADDITIONAL_POINTS, POINT_TYPES} from "./const";
 import Componenet from './component';
-import TaskEdit from "../../893621-taskmanager-8/src/task-edit";
+import moment from 'moment';
 
 export default class EventEdit extends Componenet {
   constructor(data) {
@@ -172,78 +172,46 @@ export default class EventEdit extends Componenet {
     }
   }
 
-  // _processForm(formData) {
-  //   const entry = {
-  //     title: ``,
-  //     color: ``,
-  //     tags: new Set(),
-  //     dueDate: 0,
-  //     repeatingDays: {
-  //       'mo': false,
-  //       'tu': false,
-  //       'we': false,
-  //       'th': false,
-  //       'fr': false,
-  //       'sa': false,
-  //       'su': false,
-  //     }
-  //   };
-  //   const taskEditMapper = TaskEdit.createMapper(entry);
-  //
-  //   for (const pair of formData.entries()) {
-  //     const [property, value] = pair;
-  //     if (taskEditMapper[property]) {
-  //       taskEditMapper[property](value);
-  //     }
-  //   }
-  //
-  //   return entry;
-  // }
-
   _processForm(formData) {
     const entry = {
-      type: {},
       title: ``,
-      route: [],
-      photos: [],
-    }
-    // this._type = data.type;
-    // this._title = data.title;
-    // this._tripRoute = data.tripRoute;
-    // this._photos = data.photos;
-    // this._offers = data.offers;
-    // this._destination = data.destination;
-    // this._price = data.price;
-    // this._isFavorite = data.isFavorite;
-    // this._dateBegin = data.dateBegin;
-    // this._dateEnd = data.dateEnd;
+      offers: this._offers.map((element) => {
+        element.checked = false;
+        return element;
+      }),
+      price: 0,
+      isFavorite: false,
+      dateBegin: 0,
+      dateEnd: 0
+    };
 
+    const eventEditMapper = this._createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (eventEditMapper[property]) {
+        eventEditMapper[property](value);
+      }
+    }
+    return entry;
   }
 
   _onFormSubmit(evt) {
     evt.preventDefault();
     const formData = new FormData(this._formElement);
-    console.log(...formData.entries());
-    //const newData = this._processForm(formData);
 
-    return typeof this._onSubmit === `function` && this._onSubmit();
+    const newData = this._processForm(formData);
+
+    [newData.dateBegin, newData.dateEnd] = [newData.dateBegin, newData.dateEnd]
+      .map((element) => (!moment(element).isValid() || element === 0 || typeof element === `undefined`) ? Date.now() : element);
+
+    if (typeof newData.type === `undefined`) {
+      newData.type = this._type;
+    }
+
+    this.update(newData);
+    return typeof this._onSubmit === `function` && this._onSubmit(newData);
   }
-
-  // _onSubmitButtonClick(evt) {
-  //   evt.preventDefault();
-  //   const formData = new FormData(this._formElement);
-  //   const newData = this._processForm(formData);
-  //   newData.isDate = this._state.isDate;
-  //   if (!moment(newData.dueDate).isValid() || newData.dueDate === 0) {
-  //     newData.dueDate = Date.now();
-  //   }
-  //
-  //   if (typeof this._onSubmit === `function`) {
-  //     this._onSubmit(newData);
-  //   }
-  //   this.update(newData);
-  // }
-
 
   _onFormReset(evt) {
     evt.preventDefault();
@@ -262,7 +230,6 @@ export default class EventEdit extends Componenet {
     this._index = num;
   }
 
-
   bind() {
     this._formElement = this._element.querySelector(`form`);
     this._formElement.addEventListener(`submit`, this._onFormSubmitBound);
@@ -277,5 +244,41 @@ export default class EventEdit extends Componenet {
     this._formElement.removeEventListener(`reset`, this._onFormResetBound);
     this._formElement.removeEventListener(`change`, this._onFormChangeBound);
     this._formElement = null;
+  }
+
+  update(data) {
+    this._type = data.type;
+    this._title = data.title;
+    this._offers = data.offers;
+    this._price = data.price;
+    this._isFavorite = data.isFavorite;
+    this._dateBegin = data.dateBegin;
+    this._dateEnd = data.dateEnd;
+  }
+
+  _createMapper(target) {
+    return {
+      'travel-way': (value) => {
+        target.type = POINT_TYPES.find((element) => element.name === value);
+      },
+      'destination': (value) => {
+        target.title = value;
+      },
+      'time': (value) => {
+        const values = value.split(`—`);
+        [target.dateBegin, target.dateEnd] = values.map((element) => +moment(element, `hh:mm a`));
+      },
+      'price': (value) => {
+        target.price = value;
+      },
+      'favorite': (value) => {
+        target.isFavorite = value === `on`;
+      },
+      'offer': (value) => {
+        target.offers.forEach((element) => {
+          element.checked = element.checked || element.name.split(` `).join(`-`).toLowerCase() === value;
+        });
+      },
+    };
   }
 }
