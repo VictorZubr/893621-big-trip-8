@@ -1,5 +1,6 @@
 import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY} from "./const";
 import Component from './component';
+import moment from 'moment';
 
 export default class Event extends Component {
   constructor(data) {
@@ -24,8 +25,7 @@ export default class Event extends Component {
   }
 
   _getFormattedDate(ms) {
-    const date = new Date(ms);
-    return `${date.toLocaleString(`en-US`, {day: `2-digit`})} ${date.toLocaleString(`en-US`, {month: `long`})}`;
+    return moment(ms).format(`DD MMMM`);
   }
 
   _getFormattedDuration(ms) {
@@ -35,7 +35,7 @@ export default class Event extends Component {
   }
 
   _getFormattedTime(ms) {
-    return `${(new Date(ms)).toLocaleString(`en-US`, {hour12: false, hour: `2-digit`, minute: `2-digit`})}`;
+    return moment(ms).format(`HH:MM`);
   }
 
   _getFormattedTimetable() {

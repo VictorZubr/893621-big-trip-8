@@ -39,12 +39,11 @@ export default class EventEdit extends Componenet {
   }
 
   _getFormattedDate(ms) {
-    const date = new Date(ms);
-    return `${date.toLocaleString(`en-US`, {month: `short`})} ${date.toLocaleString(`en-US`, {day: `2-digit`})}`;
+    return moment(ms).format(`MMMM DD`);
   }
 
   _getFormattedTime(ms) {
-    return `${(new Date(ms)).toLocaleString(`en-US`, {hour12: false, hour: `2-digit`, minute: `2-digit`})}`;
+    return moment(ms).format(`HH:MM`);
   }
 
   _getFormattedTimetable() {
