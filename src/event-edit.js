@@ -1,6 +1,7 @@
 import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY, ADDITIONAL_POINTS, POINT_TYPES} from "./const";
 import Componenet from './component';
 import moment from 'moment';
+import flatpickr from 'flatpickr';
 
 export default class EventEdit extends Componenet {
   constructor(data) {
@@ -20,6 +21,8 @@ export default class EventEdit extends Componenet {
 
     this._formElement = null;
     this._travelWayToggleElement = null;
+    this._timeInputElement = null;
+    this._timeFlatpickr = null;
 
     this._onSubmit = null;
     this._onReset = null;
@@ -36,12 +39,11 @@ export default class EventEdit extends Componenet {
   }
 
   _getFormattedDate(ms) {
-    const date = new Date(ms);
-    return `${date.toLocaleString(`en-US`, {month: `short`})} ${date.toLocaleString(`en-US`, {day: `2-digit`})}`;
+    return moment(ms).format(`MMMM DD`);
   }
 
   _getFormattedTime(ms) {
-    return `${(new Date(ms)).toLocaleString(`en-US`, {hour12: false, hour: `2-digit`, minute: `2-digit`})}`;
+    return moment(ms).format(`HH:MM`);
   }
 
   _getFormattedTimetable() {
@@ -94,7 +96,7 @@ export default class EventEdit extends Componenet {
     <header class="point__header">
       <label class="point__date">
         choose day
-        <input class="point__input" type="text" placeholder="${this._getFormattedDate(this._dateBegin)}" name="day">
+        <input class="point__input" type="text" placeholder="${this._getFormattedDate(this._dateBegin)}" name="day" value="${this._getFormattedDate(this._dateBegin)}">
       </label>
 
       <div class="travel-way">
@@ -237,6 +239,10 @@ export default class EventEdit extends Componenet {
     this._formElement.addEventListener(`change`, this._onFormChangeBound);
 
     this._travelWayToggleElement = this._formElement.querySelector(`#travel-way__toggle-${this._index}`);
+
+    this._timeInputElement = this._formElement.querySelector(`.point__time input`);
+    this._timeFlatpickr = flatpickr(this._timeInputElement, {mode: `range`, enableTime: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+
   }
 
   unbind() {
@@ -244,6 +250,11 @@ export default class EventEdit extends Componenet {
     this._formElement.removeEventListener(`reset`, this._onFormResetBound);
     this._formElement.removeEventListener(`change`, this._onFormChangeBound);
     this._formElement = null;
+    this._travelWayToggleElement = null;
+
+    this._timeFlatpickr.destroy();
+    this._timeFlatpickr = null;
+    this._timeInputElement = null;
   }
 
   update(data) {
@@ -258,6 +269,9 @@ export default class EventEdit extends Componenet {
 
   _createMapper(target) {
     return {
+      'day': (value) => {
+        target.dateBegin += +moment(value, `MMM DD`);
+      },
       'travel-way': (value) => {
         target.type = POINT_TYPES.find((element) => element.name === value);
       },
@@ -265,8 +279,15 @@ export default class EventEdit extends Componenet {
         target.title = value;
       },
       'time': (value) => {
-        const values = value.split(`—`);
-        [target.dateBegin, target.dateEnd] = values.map((element) => +moment(element, `hh:mm a`));
+        const values = value.split(`to`);
+        [target.dateBegin, target.dateEnd] = values.map((element) => {
+          const time = moment(element, `hh:mm a`);
+          if (time.isValid()) {
+            const dayBegin = moment(element, `hh:mm a`).startOf(`day`);
+            return target.dateBegin + time.diff(dayBegin);
+          }
+          return target.dateBegin;
+        });
       },
       'price': (value) => {
         target.price = value;
