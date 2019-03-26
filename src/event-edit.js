@@ -26,9 +26,11 @@ export default class EventEdit extends Componenet {
 
     this._onSubmit = null;
     this._onReset = null;
+    this._onDelete = null;
     this._onFormSubmitBound = this._onFormSubmit.bind(this);
     this._onFormResetBound = this._onFormReset.bind(this);
     this._onFormChangeBound = this._onFormChange.bind(this);
+    this._onDeleteButtonClickBound = this._onDeleteButtonClick.bind(this);
   }
 
   _getDuration(ms) {
@@ -220,6 +222,16 @@ export default class EventEdit extends Componenet {
     return typeof this._onReset === `function` && this._onReset();
   }
 
+  _onDeleteButtonClick() {
+    if (typeof this._onDelete === `function`) {
+      this._onDelete();
+    }
+  }
+
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
   set onSubmit(fn) {
     this._onSubmit = fn;
   }
@@ -242,6 +254,9 @@ export default class EventEdit extends Componenet {
 
     this._timeInputElement = this._formElement.querySelector(`.point__time input`);
     this._timeFlatpickr = flatpickr(this._timeInputElement, {mode: `range`, enableTime: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+
+    this._deleteButtonElement = this._formElement.querySelector(`.point__button[type="reset"]`);
+    this._deleteButtonElement.addEventListener(`click`, this._onDeleteButtonClickBound);
 
   }
 

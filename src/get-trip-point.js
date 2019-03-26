@@ -16,4 +16,5 @@ export default () => ({
   destination: `${getRandomItems(descriptions, getRandomInteger(1, 3)).join(`. `)}.`,
   price: getRandomInteger(10, 1000),
   isFavorite: getTrueOrFalse(),
+  isDeleted: false
 });
