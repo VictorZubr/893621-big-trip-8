@@ -10,7 +10,7 @@ export default class EventEdit extends Componenet {
     this._title = data.title;
     this._tripRoute = data.tripRoute;
     this._photos = data.photos;
-    this._offers = data.offers;
+    this._offers = data.offers.slice(0);
     this._destination = data.destination;
     this._price = data.price;
     this._isFavorite = data.isFavorite;
@@ -180,8 +180,10 @@ export default class EventEdit extends Componenet {
     const entry = {
       title: ``,
       offers: this._offers.map((element) => {
-        element.checked = false;
-        return element;
+        const newObj = {};
+        Object.assign(newObj, element);
+        newObj.checked = false;
+        return newObj;
       }),
       price: 0,
       isFavorite: false,
@@ -275,7 +277,7 @@ export default class EventEdit extends Componenet {
   update(data) {
     this._type = data.type;
     this._title = data.title;
-    this._offers = data.offers;
+    this._offers = data.offers.slice(0);
     this._price = data.price;
     this._isFavorite = data.isFavorite;
     this._dateBegin = data.dateBegin;

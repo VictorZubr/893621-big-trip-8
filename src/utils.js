@@ -26,10 +26,3 @@ export const createElement = (template) => {
   newElement.innerHTML = template;
   return newElement.firstChild;
 };
-
-export const createFilterElements = (template) => {
-  const fragment = document.createDocumentFragment();
-  fragment.insertBefore(template, null);
-  //fragment.innerHTML = template;
-  return fragment;
-};

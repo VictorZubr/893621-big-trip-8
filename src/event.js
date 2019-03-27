@@ -7,7 +7,7 @@ export default class Event extends Component {
     super();
     this._type = data.type;
     this._title = data.title;
-    this._offers = data.offers;
+    this._offers = data.offers.slice(0);
     this._price = data.price;
     this._dateBegin = data.dateBegin;
     this._dateEnd = data.dateEnd;
@@ -46,7 +46,7 @@ export default class Event extends Component {
 
   _getOffersHTML() {
     return this._offers
-      .map((element) => element.checked ? `<li><button class="trip-point__offer">${element.name} +&euro;&nbsp;${element.price}</button></li>` : ``)
+      .map((element) => element.checked ? `<li><button class="trip-point__offer">${element.name} +&euro; ${element.price}</button></li>` : ``)
       .join(``);
   }
 
@@ -90,7 +90,7 @@ export default class Event extends Component {
   update(data) {
     this._type = data.type;
     this._title = data.title;
-    this._offers = data.offers;
+    this._offers = data.offers.slice(0);
     this._price = data.price;
     this._isFavorite = data.isFavorite;
     this._dateBegin = data.dateBegin;

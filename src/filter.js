@@ -1,5 +1,4 @@
 import Component from './component';
-import {createElement, createFilterElements} from "./utils";
 
 export default class Filter extends Component {
   constructor(data) {
@@ -27,12 +26,6 @@ export default class Filter extends Component {
   get template() {
     return `<input type="radio" id="filter-${this._label.toLowerCase()}" name="filter" value="${this._label.toLowerCase()}"${this._state.isChecked ? ` checked` : ``}>
   <label class="trip-filter__item" for="filter-${this._label.toLowerCase()}">${this._label}</label>`;
-
-
-    // `<div>
-    //             <input type="radio" id="filter__${this._label.toLowerCase()}" class="filter__input visually-hidden" name="filter"${this._state.isChecked ? `checked` : ``}/>
-    //             <label for="filter__${this._label.toLowerCase()}" class="filter__label"> ${this._label} <span class="filter__all-count">${this._count ? this._count : ``}</span></label>
-    //        </div>`;
   }
 
   bind() {

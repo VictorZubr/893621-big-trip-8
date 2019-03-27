@@ -1,4 +1,5 @@
 import Component from './component';
+import {createElement} from "../../893621-taskmanager-8/src/utils";
 
 export default class TripHeader extends Component {
   constructor(data) {
@@ -19,6 +20,12 @@ export default class TripHeader extends Component {
     return (new Date(begin).getMonth() === date.getMonth()) ? `${date.toLocaleString(`en-US`, {day: `2-digit`})}` : this._getFormattedDate(end);
   }
 
+  _partialUpdate() {
+    this.unbind();
+    this._element.innerHTML = createElement(this.template).innerHTML;
+    this.bind();
+  }
+
   get template() {
     return `<section class="trip">
             <div class="trip__schedule">
@@ -28,5 +35,13 @@ export default class TripHeader extends Component {
             </div>
             <p class="trip__total">Total: <span class="trip__total-cost">&euro;&nbsp;${this._total}</span></p>
         </section>`;
+  }
+
+  update(data) {
+    this._route = data.route;
+    this._dateBegin = data.dateBegin;
+    this._dateEnd = data.dateEnd;
+    this._total = data.total;
+    this._partialUpdate();
   }
 }
