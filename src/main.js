@@ -1,10 +1,11 @@
 import {getRandomInteger} from "./utils";
 import getPoint from './get-trip-point';
 import {MILLISECONDS_IN_DAY, HOURS, MINUTES} from "./const";
-import Event from './event';
-import EventEdit from './event-edit';
-import TripHeader from "./trip-header";
+import Header from "./header";
 import Filter from './filter';
+import renderTrip, {getTotal} from './render-trip';
+import renderStatistic from './render-statistic';
+
 
 const FILTERS_DATA = [
   {
@@ -61,9 +62,6 @@ const getEventsArray = (count = 7) => {
   return res;
 };
 
-const getTotal = (events) =>
-  events.reduce((total, element) => total + element.price + element.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0), 0);
-
 // Функция возвращает объкт, содержащий данные о всей поездке вцелом
 
 const getTrip = (count = 7) => {
@@ -82,60 +80,11 @@ const getTrip = (count = 7) => {
 };
 
 const renderHeader = (tripData, headerContainer) => {
-  const header = new TripHeader(tripData);
+  const header = new Header(tripData);
   const nextSiblingElement = headerContainer.querySelector(`section.trip-controls`);
   headerContainer.insertBefore(header.render(), nextSiblingElement);
   return header;
 };
-
-const getPrice = (event) => +event.price + event.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0);
-
-const renderTrip = (tripData, header, eventsContainer) => {
-  eventsContainer.innerHTML = ``;
-  tripData.events
-    .filter((it) => !it.isDeleted)
-    .forEach((element, index) => {
-      const event = new Event(element);
-      const eventEdit = new EventEdit(element);
-      event.index = index;
-      eventEdit.index = index;
-
-      event.onEdit = () => {
-        eventEdit.render();
-        eventsContainer.replaceChild(eventEdit.element, event.element);
-        event.unrender();
-      };
-
-      eventEdit.onSubmit = (newObject) => {
-        const oldPrice = getPrice(element);
-        const newPrice = getPrice(newObject);
-        Object.assign(element, newObject);
-        event.update(element);
-        event.render();
-        eventsContainer.replaceChild(event.element, eventEdit.element);
-        eventEdit.unrender();
-        if (oldPrice !== newPrice) {
-
-          tripData.total = tripData.total - oldPrice + newPrice;
-          header.update(tripData);
-        }
-
-      };
-
-      eventEdit.onReset = () => {
-        event.render();
-        eventsContainer.replaceChild(event.element, eventEdit.element);
-        eventEdit.unrender();
-      };
-      eventEdit.onDelete = () => {
-        eventsContainer.removeChild(eventEdit.element);
-        element.isDeleted = true;
-        eventEdit.unrender();
-      };
-      eventsContainer.appendChild(event.render());
-    });
-};
-
 
 const tripHeaderContainer = document.querySelector(`.header__wrap`);
 const tripDayContainer = document.querySelector(`.trip-day__items`);
@@ -143,4 +92,30 @@ const initialTrip = getTrip();
 
 const header = renderHeader(initialTrip, tripHeaderContainer);
 renderTrip(initialTrip, header, tripDayContainer);
+renderStatistic(initialTrip, header, document.body);
+
+const mainContainer = document.querySelector(`main`);
+const statisticContainer = document.querySelector(`.statistic`);
+
+const tableButtonElement = document.querySelector(`nav.trip-controls__menus a:first-child`);
+const statsButtonElement = document.querySelector(`nav.trip-controls__menus a:nth-child(2)`);
+
+const onStatisticClick = () => {
+  mainContainer.classList.add(`visually-hidden`);
+  tableButtonElement.classList.remove(`view-switch__item--active`);
+
+  statisticContainer.classList.remove(`visually-hidden`);
+  statsButtonElement.classList.add(`view-switch__item--active`);
+};
+
+const onTableClick = () => {
+  statisticContainer.classList.add(`visually-hidden`);
+  statsButtonElement.classList.remove(`view-switch__item--active`);
+
+  mainContainer.classList.remove(`visually-hidden`);
+  tableButtonElement.classList.add(`view-switch__item--active`);
+};
+
+statsButtonElement.addEventListener(`click`, onStatisticClick);
+tableButtonElement.addEventListener(`click`, onTableClick);
 

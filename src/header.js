@@ -1,7 +1,7 @@
 import Component from './component';
 import {createElement} from "../../893621-taskmanager-8/src/utils";
 
-export default class TripHeader extends Component {
+export default class Header extends Component {
   constructor(data) {
     super();
     this._route = data.route;
