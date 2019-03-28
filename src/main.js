@@ -50,7 +50,7 @@ FILTERS_DATA.forEach((element) => {
 // Функция возвращает массив с требуемым количеством точек маршрута. Дата окончания первой точки становится датой начала второй точки.
 
 const getEventsArray = (count = 7) => {
-  const start = Date.now();
+  const start = Date.now() - MILLISECONDS_IN_DAY * 3;
   let res = Array.from({length: count}, getPoint);
 
   // Добавляем в объект два свойства dateBegin, dateEnd
@@ -64,13 +64,15 @@ const getEventsArray = (count = 7) => {
 
 // Функция возвращает объкт, содержащий данные о всей поездке вцелом
 
-const getTrip = (count = 7) => {
+const getTrip = (count = 50) => {
   const events = getEventsArray(count);
   const route = events.map((element) => element.title);
+  const title = route.join(` - `).substring(0, 140);
   events.forEach((element) => {
     element.tripRoute = route;
   });
   return {
+    title,
     route,
     events,
     dateBegin: events[0].dateBegin,
@@ -88,14 +90,13 @@ const renderHeader = (tripData, headerContainer) => {
 
 const tripHeaderContainer = document.querySelector(`.header__wrap`);
 const tripDayContainer = document.querySelector(`.trip-day__items`);
+const mainContainer = document.querySelector(`main`);
+const statisticContainer = document.querySelector(`.statistic`);
 const initialTrip = getTrip();
 
 const header = renderHeader(initialTrip, tripHeaderContainer);
 renderTrip(initialTrip, header, tripDayContainer);
-renderStatistic(initialTrip, header, document.body);
-
-const mainContainer = document.querySelector(`main`);
-const statisticContainer = document.querySelector(`.statistic`);
+renderStatistic(initialTrip, header, statisticContainer);
 
 const tableButtonElement = document.querySelector(`nav.trip-controls__menus a:first-child`);
 const statsButtonElement = document.querySelector(`nav.trip-controls__menus a:nth-child(2)`);

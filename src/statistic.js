@@ -2,30 +2,25 @@ import Component from './component';
 import getChart from './get-chart';
 
 export default class Statistic extends Component {
-  constructor(){
+  constructor(data) {
     super();
-    this._moneyStatistic = null;
-    this._moneyChart = null;
+    this._title = data.title;
+    this._data = data.data;
+
+    this._ctx = null;
+    this._chart = null;
+
   }
 
   get template() {
-    return `<section class="statistic content-wrap visually-hidden" id="stats">
-  <div class="statistic__item statistic__item--money">
-    <canvas class="statistic__money" width="900"></canvas>
-  </div>
-
-  <div class="statistic__item statistic__item--transport">
-    <canvas class="statistic__transport" width="900"></canvas>
-  </div>
-
-  <div class="statistic__item statistic__item--time-spend">
-    <canvas class="statistic__time-spend" width="900"></canvas>
-  </div>
-</section>`;
+    return `<div class="statistic__item statistic__item--${this._title.toLowerCase()}">
+    <canvas class="statistic__${this._title.toLowerCase()}" width="900"></canvas>
+  </div>`;
   }
 
   bind() {
-    this._moneyCtx = this.element.querySelector(`.statistic__money`);
-    this._moneyChart = getChart(this._moneyCtx, {});
+    this._ctx = this.element.querySelector(`canvas`);
+    this._chart = getChart(this._ctx, {title: this._title, data: this._data});
+
   }
 }

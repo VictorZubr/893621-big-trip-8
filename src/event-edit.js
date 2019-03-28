@@ -8,7 +8,7 @@ export default class EventEdit extends Componenet {
     super();
     this._type = data.type;
     this._title = data.title;
-    this._tripRoute = data.tripRoute;
+    this._tripRoute = data.tripRoute.slice(0);
     this._photos = data.photos;
     this._offers = data.offers.slice(0);
     this._destination = data.destination;

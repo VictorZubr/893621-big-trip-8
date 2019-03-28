@@ -1,10 +1,11 @@
-import Event from "./event";
-import EventEdit from "./event-edit";
+import Event from './event';
+import EventEdit from './event-edit';
+
 
 export const getTotal = (events) =>
   events.reduce((total, element) => total + element.price + element.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0), 0);
 
-const getPrice = (event) => +event.price + event.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0);
+export const getPrice = (event) => +event.price + event.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0);
 
 export default (tripData, header, eventsContainer) => {
   eventsContainer.innerHTML = ``;

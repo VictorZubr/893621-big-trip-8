@@ -4,7 +4,7 @@ import {createElement} from "../../893621-taskmanager-8/src/utils";
 export default class Header extends Component {
   constructor(data) {
     super();
-    this._route = data.route;
+    this._title = data.title;
     this._dateBegin = data.dateBegin;
     this._dateEnd = data.dateEnd;
     this._total = data.total;
@@ -30,7 +30,7 @@ export default class Header extends Component {
     return `<section class="trip">
             <div class="trip__schedule">
                 <i class="trip-icon">⛰️</i>
-                <h1 class="trip__points">${this._route.join(` - `)}</h1>
+                <h1 class="trip__points">${this._title}</h1>
                 <p class="trip__dates">${this._getFormattedDate(this._dateBegin)}&nbsp;&mdash; ${this._getSecondFormattedDate(this._dateBegin, this._dateEnd)}</p>
             </div>
             <p class="trip__total">Total: <span class="trip__total-cost">&euro;&nbsp;${this._total}</span></p>
