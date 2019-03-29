@@ -5,11 +5,22 @@ export default class Statistic extends Component {
   constructor(data) {
     super();
     this._title = data.title;
+    this._formatter = data.formatter;
     this._data = data.data;
 
+    this._onUpdate = null;
     this._ctx = null;
     this._chart = null;
+    this._onStatsButtonClickBound = this._onStatsButtonClick.bind(this);
 
+  }
+
+  _onStatsButtonClick() {
+    return typeof this._onUpdate === `function` && this._onUpdate();
+  }
+
+  set onUpdate(fn) {
+    this._onUpdate = fn;
   }
 
   get template() {
@@ -20,7 +31,9 @@ export default class Statistic extends Component {
 
   bind() {
     this._ctx = this.element.querySelector(`canvas`);
-    this._chart = getChart(this._ctx, {title: this._title, data: this._data});
+    this._chart = getChart(this._ctx, {title: this._title, data: this._data, formatter: this._formatter});
 
+    this._statsButtonElement = document.querySelector(`nav.trip-controls__menus a:nth-child(2)`);
+    this._statsButtonElement.addEventListener(`click`, this._onStatsButtonClickBound);
   }
 }

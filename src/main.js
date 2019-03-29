@@ -1,6 +1,6 @@
 import {getRandomInteger} from "./utils";
 import getPoint from './get-trip-point';
-import {MILLISECONDS_IN_DAY, HOURS, MINUTES} from "./const";
+import {MILLISECONDS_IN_DAY, MILLISECONDS_IN_MINUTE, HOURS, MINUTES} from "./const";
 import Header from "./header";
 import Filter from './filter';
 import renderTrip, {getTotal} from './render-trip';
@@ -57,14 +57,14 @@ const getEventsArray = (count = 7) => {
 
   res.forEach((element, index, arr) => {
     element.dateBegin = (index === 0) ? start : arr[index - 1].dateEnd;
-    element.dateEnd = element.dateBegin + getRandomInteger(MINUTES / 12, HOURS * MINUTES) * MILLISECONDS_IN_DAY / HOURS / MINUTES; // от 5 мин. до 1 суток
+    element.dateEnd = element.dateBegin + getRandomInteger(MINUTES / 12, HOURS * MINUTES) * MILLISECONDS_IN_MINUTE; // от 5 мин. до 1 суток
   });
   return res;
 };
 
 // Функция возвращает объкт, содержащий данные о всей поездке вцелом
 
-const getTrip = (count = 50) => {
+const getTrip = (count = 7) => {
   const events = getEventsArray(count);
   const route = events.map((element) => element.title);
   const title = route.join(` - `).substring(0, 140);
@@ -96,12 +96,13 @@ const initialTrip = getTrip();
 
 const header = renderHeader(initialTrip, tripHeaderContainer);
 renderTrip(initialTrip, header, tripDayContainer);
-renderStatistic(initialTrip, header, statisticContainer);
+
 
 const tableButtonElement = document.querySelector(`nav.trip-controls__menus a:first-child`);
 const statsButtonElement = document.querySelector(`nav.trip-controls__menus a:nth-child(2)`);
 
 const onStatisticClick = () => {
+  renderStatistic(initialTrip, header, statisticContainer);
   mainContainer.classList.add(`visually-hidden`);
   tableButtonElement.classList.remove(`view-switch__item--active`);
 

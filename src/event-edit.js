@@ -205,10 +205,10 @@ export default class EventEdit extends Componenet {
   _onFormSubmit(evt) {
     evt.preventDefault();
     const formData = new FormData(this._formElement);
-
     const newData = this._processForm(formData);
 
-    [newData.dateBegin, newData.dateEnd] = [newData.dateBegin, newData.dateEnd]
+    [newData.dateBegin, newData.dateEnd] =
+      [newData.dateBegin, newData.dateEnd]
       .map((element) => (!moment(element).isValid() || element === 0 || typeof element === `undefined`) ? Date.now() : element);
 
     if (typeof newData.type === `undefined`) {
@@ -255,7 +255,17 @@ export default class EventEdit extends Componenet {
     this._travelWayToggleElement = this._formElement.querySelector(`#travel-way__toggle-${this._index}`);
 
     this._timeInputElement = this._formElement.querySelector(`.point__time input`);
-    this._timeFlatpickr = flatpickr(this._timeInputElement, {mode: `range`, enableTime: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+    this._timeFlatpickr = flatpickr(this._timeInputElement,
+        {
+          mode: `range`,
+          enableTime: true,
+          dateFormat: `H:i`,
+          defaultDate: [this._dateBegin, this._dateEnd],
+          onClose: (dates) => {
+            this._dateBegin = +moment(dates[0]);
+            this._dateEnd = +moment(dates[1]);
+          }
+        });
 
     this._deleteButtonElement = this._formElement.querySelector(`.point__button[type="reset"]`);
     this._deleteButtonElement.addEventListener(`click`, this._onDeleteButtonClickBound);

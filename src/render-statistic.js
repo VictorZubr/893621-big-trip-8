@@ -4,6 +4,7 @@ import {getPrice} from './render-trip';
 
 const getChartDataObject = (data, name) => ({
   title: name,
+  formatter: data.formatter,
   data: {
     labels: data.map((element) => element[1].icon + ` ` + element[1].name),
     datasets: [{
@@ -23,6 +24,7 @@ const clipSortedItems = (arr, labels) => {
 const getStatisticData = (events, pointTypes) => {
   const result = pointTypes
     .map((type) => events
+      .filter((it) => !it.isDeleted)
       .reduce(([sum, count], event) => {
         [sum, count] = (event.type.name === type.name) ? [sum += getPrice(event), count += 1] : [sum, count];
         return [sum, count];
@@ -32,16 +34,23 @@ const getStatisticData = (events, pointTypes) => {
 };
 
 export default (tripdata, header, container) => {
+  container.innerHTML = ``;
   const [statSums, statCounts] = getStatisticData(tripdata.events, POINT_TYPES);
 
   const moneyStatisticData = getChartDataObject(clipSortedItems(statSums, POINT_TYPES), `money`);
+  moneyStatisticData.formatter = `€ `;
   const moneyStatistic = new Statistic(moneyStatisticData);
+  moneyStatistic.onUpdate = () => {
+
+  };
+
   container.appendChild(moneyStatistic.render());
 
   const transportStatisticData = getChartDataObject(
       clipSortedItems(statCounts, POINT_TYPES).filter((element) => element[1].text.lastIndexOf(` to`) > 0)
       , `transport`
   );
+  transportStatisticData.formatter = ``;
   const transportStatistic = new Statistic(transportStatisticData);
   container.appendChild(transportStatistic.render());
 };

@@ -21,6 +21,7 @@ export default class Event extends Component {
     const days = Math.floor(ms / MILLISECONDS_IN_DAY);
     const hours = Math.floor((ms - days * MILLISECONDS_IN_DAY) / MILLISECONDS_IN_HOUR);
     const minutes = Math.floor((ms - days * MILLISECONDS_IN_DAY - hours * MILLISECONDS_IN_HOUR) / MILLISECONDS_IN_MINUTE);
+
     return {days, hours, minutes};
   }
 
@@ -29,13 +30,12 @@ export default class Event extends Component {
   }
 
   _getFormattedDuration(ms) {
-    const duration = this._getDuration(ms);
-    return [[duration.days, `d`], [duration.hours, `h`], [duration.minutes, `m`]]
-      .map((element) => (element[0]) ? `${element[0]}${element[1]} ` : ``).join(``);
+    const days = moment.duration(ms).days();
+    return `${days > 0 ? days + `D ` : ``}${moment.duration(ms).hours()}H ${moment.duration(ms).minutes()}M`;
   }
 
   _getFormattedTime(ms) {
-    return moment(ms).format(`HH:MM`);
+    return moment(+ms).format(`HH:mm`);
   }
 
   _getFormattedTimetable() {

@@ -15,7 +15,7 @@ export default (ctx, config) => {
           color: `#000000`,
           anchor: `end`,
           align: `start`,
-          formatter: (val) => `€ ${val}`
+          formatter: (val) => `${config.formatter}${val}`
         }
       },
       title: {
