@@ -1,5 +1,5 @@
 import Component from './component';
-import {createElement} from "../../893621-taskmanager-8/src/utils";
+import {createElement} from "./utils";
 
 export default class Header extends Component {
   constructor(data) {
