@@ -5,7 +5,11 @@ import Header from "./header";
 import Filter from './filter';
 import renderTrip, {getTotal} from './render-trip';
 import renderStatistic from './render-statistic';
+import API from './api';
 
+
+const AUTHORIZATION = `Basic jkoiuy34ckB66w88YXNzd29yZAo`;
+const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 
 const FILTERS_DATA = [
   {
@@ -49,25 +53,41 @@ FILTERS_DATA.forEach((element) => {
 
 // Функция возвращает массив с требуемым количеством точек маршрута. Дата окончания первой точки становится датой начала второй точки.
 
-const getEventsArray = (count = 7) => {
-  const start = Date.now() - MILLISECONDS_IN_DAY * 3;
-  let res = Array.from({length: count}, getPoint);
+// const getEventsArray = (count = 7) => {
+//   const start = Date.now() - MILLISECONDS_IN_DAY * 3;
+//   let res = Array.from({length: count}, getPoint);
+//
+//   // Добавляем в объект два свойства dateBegin, dateEnd
+//
+//   res.forEach((element, index, arr) => {
+//     element.dateBegin = (index === 0) ? start : arr[index - 1].dateEnd;
+//     element.dateEnd = element.dateBegin + getRandomInteger(MINUTES / 12, HOURS * MINUTES) * MILLISECONDS_IN_MINUTE; // от 5 мин. до 1 суток
+//   });
+//   return res;
+// };
 
-  // Добавляем в объект два свойства dateBegin, dateEnd
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
-  res.forEach((element, index, arr) => {
-    element.dateBegin = (index === 0) ? start : arr[index - 1].dateEnd;
-    element.dateEnd = element.dateBegin + getRandomInteger(MINUTES / 12, HOURS * MINUTES) * MILLISECONDS_IN_MINUTE; // от 5 мин. до 1 суток
-  });
-  return res;
-};
+// const getEventsArray = () => {
+// const events = api.getEvents();
+// //console.log(events);
+// return events;
+// };
+
+// api.getTasks()
+//   .then((tasks) => {
+//     renderTasks(tasks);
+//   });
+
 
 // Функция возвращает объкт, содержащий данные о всей поездке вцелом
 
-const getTrip = (count = 7) => {
-  const events = getEventsArray(count);
+const getTrip = (events) => {
+  //const events = getEventsArray(count);//
+  console.log(events);
   const route = events.map((element) => element.title);
-  const title = route.join(` - `).substring(0, 140);
+  const title = route.join(` - `);
+    //.substring(0, 140);
   events.forEach((element) => {
     element.tripRoute = route;
   });
@@ -92,10 +112,22 @@ const tripHeaderContainer = document.querySelector(`.header__wrap`);
 const tripDayContainer = document.querySelector(`.trip-day__items`);
 const mainContainer = document.querySelector(`main`);
 const statisticContainer = document.querySelector(`.statistic`);
-const initialTrip = getTrip();
+let initialTrip;
+//= getTrip(getTrip);
 
-const header = renderHeader(initialTrip, tripHeaderContainer);
-renderTrip(initialTrip, header, tripDayContainer);
+
+
+api.getEvents()
+  .then((events) => {
+    const initialTrip = getTrip(events);
+    const header = renderHeader(initialTrip, tripHeaderContainer);
+    renderTrip(initialTrip, header, tripDayContainer);
+  });
+
+
+
+
+
 
 
 const tableButtonElement = document.querySelector(`nav.trip-controls__menus a:first-child`);

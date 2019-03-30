@@ -15,7 +15,7 @@ export const POINT_TYPES = [
   {name: `drive`, icon: `🚗`, text: `Drive to`, group: 1},
   {name: `flight`, icon: `✈️`, text: `Flight to`, group: 1},
   {name: `check-in`, icon: `🏨`, text: `Check-in`, group: 2},
-  {name: `sight-seeing`, icon: `🏛️`, text: `Sightseeing`, group: 2},
+  {name: `sightseeing`, icon: `🏛️`, text: `Sightseeing`, group: 2},
   {name: `restaurant`, icon: `🍴`, text: `Restaurant`, group: 2}
 ];
 
