@@ -35,13 +35,11 @@ export default class Event extends Component {
   }
 
   _getFormattedTime(ms) {
-    return moment(+ms).format(`HH:mm`);
+    return moment(ms).format(`HH:mm`);
   }
 
-  _getFormattedTimetable() {
-    return (this._getDuration(this._dateEnd - this._dateBegin).days > 0) ?
-      `${this._getFormattedDate(this._dateBegin)} ${this._getFormattedTime(this._dateEnd)}&nbsp;&mdash; ${this._getFormattedDate(this._dateEnd)} ${this._getFormattedTime(this._dateEnd)}` :
-      `${this._getFormattedTime(this._dateBegin)}&nbsp;&mdash; ${this._getFormattedTime(this._dateEnd)}`;
+  _getFormattedTimetable(dateBegin, dateEnd) {
+    return `${this._getFormattedTime(dateBegin)}&nbsp;&mdash; ${this._getFormattedTime(dateEnd)}`;
   }
 
   _getOffersHTML() {

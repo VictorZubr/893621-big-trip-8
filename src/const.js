@@ -5,6 +5,8 @@ export const MILLISECONDS_IN_MINUTE = 60 * 1000;
 export const MILLISECONDS_IN_HOUR = 60 * MILLISECONDS_IN_MINUTE;
 export const MILLISECONDS_IN_DAY = 24 * MILLISECONDS_IN_HOUR;
 export const ADDITIONAL_POINTS = [`airport`, `hotel`];
+export const WAIT_TEXT = `Loading route...`;
+export const LOAD_ERROR_TEXT = `Something went wrong while loading your route info. Check your connection or try again later.`;
 
 export const POINT_TYPES = [
   {name: `taxi`, icon: `🚕`, text: `Taxi to`, group: 1},
@@ -15,7 +17,7 @@ export const POINT_TYPES = [
   {name: `drive`, icon: `🚗`, text: `Drive to`, group: 1},
   {name: `flight`, icon: `✈️`, text: `Flight to`, group: 1},
   {name: `check-in`, icon: `🏨`, text: `Check-in`, group: 2},
-  {name: `sight-seeing`, icon: `🏛️`, text: `Sightseeing`, group: 2},
+  {name: `sightseeing`, icon: `🏛️`, text: `Sightseeing`, group: 2},
   {name: `restaurant`, icon: `🍴`, text: `Restaurant`, group: 2}
 ];
 

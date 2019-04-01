@@ -1,13 +1,13 @@
 import Event from './event';
 import EventEdit from './event-edit';
-
+import {api} from './main';
 
 export const getTotal = (events) =>
   events.reduce((total, element) => total + element.price + element.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0), 0);
 
 export const getPrice = (event) => +event.price + event.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0);
 
-export default (tripData, header, eventsContainer) => {
+export const renderTrip = (tripData, header, eventsContainer, destinations) => {
   eventsContainer.innerHTML = ``;
   tripData.events
     .filter((it) => !it.isDeleted)
@@ -27,16 +27,17 @@ export default (tripData, header, eventsContainer) => {
         const oldPrice = getPrice(element);
         const newPrice = getPrice(newObject);
         Object.assign(element, newObject);
-        event.update(element);
-        event.render();
-        eventsContainer.replaceChild(event.element, eventEdit.element);
-        eventEdit.unrender();
-        if (oldPrice !== newPrice) {
-
-          tripData.total = tripData.total - oldPrice + newPrice;
-          header.update(tripData);
-        }
-
+        api.updateEvent({id: element.id, data: element.toRAW()}, eventEdit.element)
+          .then((newEvent) => {
+            event.update(newEvent);
+            event.render();
+            eventsContainer.replaceChild(event.element, eventEdit.element);
+            eventEdit.unrender();
+            if (oldPrice !== newPrice) {
+              tripData.total = tripData.total - oldPrice + newPrice;
+              header.update(tripData);
+            }
+          });
       };
 
       eventEdit.onReset = () => {
@@ -44,11 +45,26 @@ export default (tripData, header, eventsContainer) => {
         eventsContainer.replaceChild(event.element, eventEdit.element);
         eventEdit.unrender();
       };
-      eventEdit.onDelete = () => {
-        eventsContainer.removeChild(eventEdit.element);
-        element.isDeleted = true;
-        eventEdit.unrender();
+
+      eventEdit.onDelete = (id) => {
+        api.deleteEvent(id, eventEdit.element)
+          .then(() => api.getEvents())
+          .then((newEvents) => {
+            const route = newEvents.map((it) => it.title);
+            const title = route.join(` - `);
+            newEvents.forEach((it) => {
+              it.tripRoute = route;
+              it.destinations = destinations;
+            });
+            tripData.title = title;
+            tripData.route = route;
+            tripData.events = newEvents;
+            tripData.total = getTotal(newEvents);
+            renderTrip(tripData, header, eventsContainer, destinations);
+            header.update(tripData);
+          });
       };
+
       eventsContainer.appendChild(event.render());
     });
 };
