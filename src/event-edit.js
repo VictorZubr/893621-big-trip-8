@@ -1,14 +1,16 @@
-import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY, ADDITIONAL_POINTS, POINT_TYPES} from "./const";
+import {ADDITIONAL_POINTS, POINT_TYPES} from './const';
 import Componenet from './component';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
+import {createElement} from './utils';
 
 export default class EventEdit extends Componenet {
   constructor(data) {
     super();
+    this._id = data.id;
     this._type = data.type;
     this._title = data.title;
-    this._tripRoute = data.tripRoute.slice(0);
+    this._destinations = data.destinations;
     this._photos = data.photos;
     this._offers = data.offers.slice(0);
     this._destination = data.destination;
@@ -25,6 +27,7 @@ export default class EventEdit extends Componenet {
     this._dateBeginFlatpickr = null;
     this._dateEndElement = null;
     this._dateEndFlatpickr = null;
+    this._destinationElement = null;
 
     this._onSubmit = null;
     this._onReset = null;
@@ -33,14 +36,8 @@ export default class EventEdit extends Componenet {
     this._onFormResetBound = this._onFormReset.bind(this);
     this._onFormChangeBound = this._onFormChange.bind(this);
     this._onDeleteButtonClickBound = this._onDeleteButtonClick.bind(this);
+    this._onChangeDestinationBound = this._onDestinationChange.bind(this);
   }
-
-  // _getDuration(ms) {
-  //   const days = Math.floor(ms / MILLISECONDS_IN_DAY);
-  //   const hours = Math.floor((ms - days * MILLISECONDS_IN_DAY) / MILLISECONDS_IN_HOUR);
-  //   const minutes = Math.floor((ms - days * MILLISECONDS_IN_DAY - hours * MILLISECONDS_IN_HOUR) / MILLISECONDS_IN_MINUTE);
-  //   return {days, hours, minutes};
-  // }
 
   _getFormattedDate(ms) {
     return moment(ms).format(`MMMM DD`);
@@ -49,12 +46,6 @@ export default class EventEdit extends Componenet {
   _getFormattedTime(ms) {
     return moment(ms).format(`HH:MM`);
   }
-
-  // _getFormattedTimetable() {
-  //   return (this._getDuration(this._dateEnd - this._dateBegin).days > 0) ?
-  //     `${this._getFormattedDate(this._dateBegin)} ${this._getFormattedTime(this._dateEnd)}&nbsp;&mdash; ${this._getFormattedDate(this._dateEnd)} ${this._getFormattedTime(this._dateEnd)}` :
-  //     `${this._getFormattedTime(this._dateBegin)}&nbsp;&mdash; ${this._getFormattedTime(this._dateEnd)}`;
-  // }
 
   _getOfferValue(offer) {
     return offer.toLowerCase().replace(/\s/g, `-`);
@@ -71,7 +62,7 @@ export default class EventEdit extends Componenet {
   }
 
   _getDestinationsHTML() {
-    return Array.from(new Set(this._tripRoute)).concat(ADDITIONAL_POINTS).map((element) => `<option value="${element}"></option>`).join(``);
+    return Array.from(new Set(this._destinations.map((it) => it.name))).concat(ADDITIONAL_POINTS).map((element) => `<option value="${element}"></option>`).join(``);
   }
 
   _getDescriptionHTML() {
@@ -127,11 +118,6 @@ export default class EventEdit extends Componenet {
         <input class="point__input" type="text" value="${this._getFormattedTime(this._dateBegin)}" name="date-start" placeholder="19:00">
         <input class="point__input" type="text" value="${this._getFormattedTime(this._dateEnd)}" name="date-end" placeholder="21:00">
       </div>
-<!--      <label class="point__time">
-
-        choose time
-<input class="point__input" type="text" value="${this._getFormattedTime(this._dateBegin)}&nbsp;&mdash; ${this._getFormattedTime(this._dateEnd)}" name="time" placeholder="00:00 — 00:00">
-      </label>-->
 
       <label class="point__price">
         write price
@@ -174,12 +160,33 @@ export default class EventEdit extends Componenet {
 `;
   }
 
+  _onDestinationChange(evt) {
+    const destination = this._destinations.find((it) => it.name === evt.target.value);
+    if (typeof destination !== `undefined`) {
+      this._title = destination.name;
+      this._destination = destination.description;
+      this._photos = destination.pictures.map((it) => it.src);
+      this._partialUpdate();
+    } else {
+      evt.target.value = this._title;
+    }
+  }
+
   _onFormChange(evt) {
     if (evt.target.name === `travel-way`) {
       this._type = POINT_TYPES.find((element) => element.name === evt.target.value);
       this._formElement.querySelector(`.point__destination-label`).innerText = this._type.text;
       this._formElement.querySelector(`.travel-way__label`).innerText = this._type.icon;
       this._travelWayToggleElement.click();
+      if (typeof this._type.offers !== `undefined`) {
+        this._offers = this._type.offers.map((it) => {
+          it.checked = false;
+          return it;
+        });
+      } else {
+        this._offers = [];
+      }
+      this._partialUpdate();
     }
   }
 
@@ -201,7 +208,6 @@ export default class EventEdit extends Componenet {
     const eventEditMapper = this._createMapper(entry);
 
     for (const pair of formData.entries()) {
-      console.log(pair);
       const [property, value] = pair;
       if (eventEditMapper[property]) {
         eventEditMapper[property](value);
@@ -234,7 +240,7 @@ export default class EventEdit extends Componenet {
 
   _onDeleteButtonClick() {
     if (typeof this._onDelete === `function`) {
-      this._onDelete();
+      this._onDelete(this._id);
     }
   }
 
@@ -261,6 +267,8 @@ export default class EventEdit extends Componenet {
     this._formElement.addEventListener(`change`, this._onFormChangeBound);
 
     this._travelWayToggleElement = this._formElement.querySelector(`#travel-way__toggle-${this._index}`);
+    this._destinationElement = this._formElement.querySelector(`#destination`);
+    this._destinationElement.addEventListener(`change`, this._onChangeDestinationBound);
 
     this._dateBeginElement = this._formElement.querySelector(`.point__time input[name="date-start"]`);
     this._dateBeginFlatpickr = flatpickr(this._dateBeginElement,
@@ -281,7 +289,6 @@ export default class EventEdit extends Componenet {
     this._dateEndElement = this._formElement.querySelector(`.point__time input[name="date-end"]`);
     this._dateEndFlatpickr = flatpickr(this._dateEndElement,
         {
-          //mode: `range`,
           mode: `single`,
           enableTime: true,
           dateFormat: `d m H:i`,
@@ -293,7 +300,7 @@ export default class EventEdit extends Componenet {
             this._dateEnd = +moment(dates[0]);
             this._dateBeginFlatpickr.config.maxDate = this._dateEnd;
           }
-      });
+        });
 
     this._deleteButtonElement = this._formElement.querySelector(`.point__button[type="reset"]`);
     this._deleteButtonElement.addEventListener(`click`, this._onDeleteButtonClickBound);
@@ -306,10 +313,13 @@ export default class EventEdit extends Componenet {
     this._formElement.removeEventListener(`change`, this._onFormChangeBound);
     this._formElement = null;
     this._travelWayToggleElement = null;
+    this._destinationElement.removeEventListener(`change`, this._onChangeDestinationBound);
+    this._destinationElement = null;
 
     this._dateBeginFlatpickr.destroy();
     this._dateBeginFlatpickr = null;
     this._dateBeginElement = null;
+
     this._dateEndFlatpickr.destroy();
     this._dateEndFlatpickr = null;
     this._dateEndElement = null;
@@ -325,11 +335,14 @@ export default class EventEdit extends Componenet {
     this._dateEnd = data.dateEnd;
   }
 
+  _partialUpdate() {
+    this.unbind();
+    this._element.innerHTML = createElement(this.template).innerHTML;
+    this.bind();
+  }
+
   _createMapper(target) {
     return {
-      // 'day': (value) => {
-      //   target.dateBegin += +moment(value, `MMM DD`);
-      // },
       'travel-way': (value) => {
         target.type = POINT_TYPES.find((element) => element.name === value);
       },
@@ -342,20 +355,6 @@ export default class EventEdit extends Componenet {
       'date-end': (value) => {
         target.dateEnd += +moment(value, `DD MM hh:mm a`);
       },
-
-      // 'time': (value) => {
-      //   const values = value.split(`to`);
-      //   [target.dateBegin, target.dateEnd] = values.map((element) => {
-      //     const time = moment(element, `hh:mm a`);
-      //     if (time.isValid()) {
-      //       const dayBegin = moment(element, `hh:mm a`).startOf(`day`);
-      //       return target.dateBegin + time.diff(dayBegin);
-      //     }
-      //     return target.dateBegin;
-      //   });
-      // },
-
-
       'price': (value) => {
         target.price = value;
       },
