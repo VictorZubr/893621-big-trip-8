@@ -66,6 +66,8 @@ a:hover {
 .trip__points {
   font-size: var(--font-size-bigger);
   margin: 0 0 5px;
+  overflow-y: hidden;
+  max-height: 55px;
 }
 
 .trip__schedule .trip-icon {

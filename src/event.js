@@ -3,8 +3,9 @@ import Component from './component';
 import moment from 'moment';
 
 export default class Event extends Component {
-  constructor(data) {
+  constructor(data, parent) {
     super();
+    this._parent = parent;
     this._type = data.type;
     this._title = data.title;
     this._offers = data.offers.slice(0);
@@ -58,6 +59,10 @@ export default class Event extends Component {
 
   set index(num) {
     this._index = num;
+  }
+
+  get parent() {
+    return this._parent;
   }
 
   get template() {

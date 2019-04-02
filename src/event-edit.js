@@ -5,8 +5,9 @@ import flatpickr from 'flatpickr';
 import {createElement} from './utils';
 
 export default class EventEdit extends Componenet {
-  constructor(data) {
+  constructor(data, parent) {
     super();
+    this._parent = parent;
     this._id = data.id;
     this._type = data.type;
     this._title = data.title;
@@ -32,11 +33,13 @@ export default class EventEdit extends Componenet {
     this._onSubmit = null;
     this._onReset = null;
     this._onDelete = null;
+    this._onEsc = null;
     this._onFormSubmitBound = this._onFormSubmit.bind(this);
     this._onFormResetBound = this._onFormReset.bind(this);
     this._onFormChangeBound = this._onFormChange.bind(this);
     this._onDeleteButtonClickBound = this._onDeleteButtonClick.bind(this);
     this._onChangeDestinationBound = this._onDestinationChange.bind(this);
+    this._onEscKeyupBound = this._onEscKeyup.bind(this);
   }
 
   _getFormattedDate(ms) {
@@ -83,6 +86,10 @@ export default class EventEdit extends Componenet {
             value="${element.name}">
        <label class="travel-way__select-label" for="travel-way-${element.name}-${this._index}">${element.icon} ${element.name}</label>`
     ).join(``);
+  }
+
+  get parent() {
+    return this._parent;
   }
 
   get template() {
@@ -156,8 +163,7 @@ export default class EventEdit extends Componenet {
       <input type="hidden" class="point__total-price" name="total-price" value="">
     </section>
   </form>
-</article>
-`;
+</article>`;
   }
 
   _onDestinationChange(evt) {
@@ -238,10 +244,19 @@ export default class EventEdit extends Componenet {
     return typeof this._onReset === `function` && this._onReset();
   }
 
+  _onEscKeyup(evt) {
+    return (typeof this._onEsc === `function`) && (evt.keyCode === 27) && this._onEsc();
+  }
+
   _onDeleteButtonClick() {
     if (typeof this._onDelete === `function`) {
       this._onDelete(this._id);
     }
+  }
+
+  set onEsc(fn) {
+    console.log(fn);
+    this._onEsc = fn;
   }
 
   set onDelete(fn) {
@@ -305,6 +320,7 @@ export default class EventEdit extends Componenet {
     this._deleteButtonElement = this._formElement.querySelector(`.point__button[type="reset"]`);
     this._deleteButtonElement.addEventListener(`click`, this._onDeleteButtonClickBound);
 
+    document.addEventListener(`keyup`, this._onEscKeyupBound);
   }
 
   unbind() {
@@ -312,7 +328,9 @@ export default class EventEdit extends Componenet {
     this._formElement.removeEventListener(`reset`, this._onFormResetBound);
     this._formElement.removeEventListener(`change`, this._onFormChangeBound);
     this._formElement = null;
+
     this._travelWayToggleElement = null;
+
     this._destinationElement.removeEventListener(`change`, this._onChangeDestinationBound);
     this._destinationElement = null;
 
@@ -323,6 +341,11 @@ export default class EventEdit extends Componenet {
     this._dateEndFlatpickr.destroy();
     this._dateEndFlatpickr = null;
     this._dateEndElement = null;
+
+    this._deleteButtonElement.removeEventListener(`click`, this._onDeleteButtonClickBound);
+    this._deleteButtonElement = null;
+
+    document.removeEventListener(`keyup`, this._onEscKeyupBound);
   }
 
   update(data) {
