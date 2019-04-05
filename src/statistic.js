@@ -19,9 +19,9 @@ export default class Statistic extends Component {
     return typeof this._onUpdate === `function` && this._onUpdate();
   }
 
-  set onUpdate(fn) {
-    this._onUpdate = fn;
-  }
+  // set onUpdate(fn) {
+  //   this._onUpdate = fn;
+  // }
 
   get template() {
     return `<div class="statistic__item statistic__item--${this._title.toLowerCase()}">

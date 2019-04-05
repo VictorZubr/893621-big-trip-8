@@ -6,7 +6,7 @@ import moment from 'moment';
 import {sort} from './const';
 
 export const getTotal = (events) =>
-  events.reduce((total, element) => total + element.price + element.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0), 0);
+  events.reduce((total, element) => +total + element.price + element.offers.reduce((acc, it) => it.checked ? +acc + it.price : acc, 0), 0);
 
 export const getPrice = (event) => +event.price + event.offers.reduce((acc, it) => it.checked ? acc + it.price : acc, 0);
 
@@ -28,10 +28,11 @@ const updateTripData = (tripData, destinations) => {
   return tripData;
 };
 
-const eventEditOnSubmit = (tripData, header, element, event, eventEdit, dayContainer, eventsContainer, destinations, newObject) => {
+const eventEditOnSubmit = (tripData, header, element, event, eventEdit, dayContainer, eventsContainer, destinations, sortMethod, newObject) => {
   const oldPrice = getPrice(element);
   const newPrice = getPrice(newObject);
   const oldDateBegin = element.dateBegin;
+  console.log(`Пришло в рендер: `, newObject.dateBegin)
   const newDateBegin = newObject.dateBegin;
   const isEventNameUpdated = element.title !== newObject.title;
   Object.assign(element, newObject);
@@ -39,10 +40,10 @@ const eventEditOnSubmit = (tripData, header, element, event, eventEdit, dayConta
     .then((newEvent) => {
       event.update(newEvent);
 
-      // Если дата начала события поменялась, то рендерим все события заново, чтобы событие всало в нужный контейнер
-      if (+moment(oldDateBegin).startOf('day') !== +moment(newDateBegin).startOf('day')) {
+      // Если дата начала события поменялась, то рендерим все события заново, чтобы событие встало в нужный контейнер
+      if (+moment(oldDateBegin).startOf(`day`) !== +moment(newDateBegin).startOf(`day`)) {
         tripData = updateTripData(tripData, destinations);
-        renderTrip(tripData, header, eventsContainer, destinations);
+        renderTrip(tripData, header, eventsContainer, destinations, sortMethod);
         header.update(tripData);
         return;
       }
@@ -50,6 +51,7 @@ const eventEditOnSubmit = (tripData, header, element, event, eventEdit, dayConta
       event.render();
       dayContainer.replaceChild(event.element, eventEdit.element);
       eventEdit.unrender();
+
       if (isEventNameUpdated) {
         const route = tripData.events.map((it) => it.title);
         const title = route.join(` - `);
@@ -70,34 +72,43 @@ const eventEditOnReset = (event, eventEdit, eventsContainer) => {
   eventEdit.unrender();
 };
 
-const eventEditOnDelete = (id, tripData, header, eventEdit, eventsContainer, destinations) => {
-  api.deleteEvent(id, eventEdit.element)
+const eventEditOnDelete = (id, tripData, header, eventEdit, eventsContainer, destinations, sortMethod) => {
+  api.deleteEvent({id}, eventEdit.element)
     .then(() => api.getEvents())
     .then((newEvents) => {
       tripData.events = newEvents;
       tripData = updateTripData(tripData, destinations);
-      renderTrip(tripData, header, eventsContainer, destinations);
+      renderTrip(tripData, header, eventsContainer, destinations, sortMethod);
       header.update(tripData);
     });
 };
 
 const renderDay = (count, date, container) => {
-  const tripDay = new TripDay({number: count, date: date});
+  const tripDay = new TripDay({number: count, date});
   container.appendChild(tripDay.render());
   return tripDay;
 };
 
-export const renderTrip = (tripData, header, eventsContainer, destinations, sortMethod) => {
-
+export const renderTrip = (tripData, header, eventsContainer, destinations, sortMethod = sort.EVENT) => {
   eventsContainer.innerHTML = ``;
   let currentDate = null;
   let currentCount = 0;
   let pastDay = null;
   tripData.events
     .filter((it) => !it.isDeleted)
+    .sort((a, b) => {
+      switch (sortMethod) {
+        case `sorting-event`:
+          return a.dateBegin - b.dateBegin;
+        case `sorting-time`:
+          return (b.dateEnd - b.dateBegin) - (a.dateEnd - a.dateBegin);
+        case `sorting-price`:
+          return b.price - a.price;
+      }
+    })
     .forEach((element, index) => {
       // Если день другой, создаем новый контейнер дня
-      const currentDay = (+moment(currentDate).startOf('day') !== +moment(element.dateBegin).startOf('day')) ?
+      const currentDay = (+moment(currentDate).startOf(`day`) !== +moment(element.dateBegin).startOf(`day`)) ?
         renderDay(++currentCount, element.dateBegin, eventsContainer) : pastDay;
       currentDate = element.dateBegin;
       pastDay = currentDay;
@@ -111,7 +122,7 @@ export const renderTrip = (tripData, header, eventsContainer, destinations, sort
       };
 
       eventEdit.onSubmit = (newObject) => {
-        eventEditOnSubmit(tripData, header, element, event, eventEdit, currentDay.itemsElement, eventsContainer, destinations, newObject);
+        eventEditOnSubmit(tripData, header, element, event, eventEdit, currentDay.itemsElement, eventsContainer, destinations, sortMethod, newObject);
       };
 
       eventEdit.onReset = () => {
@@ -123,7 +134,7 @@ export const renderTrip = (tripData, header, eventsContainer, destinations, sort
       };
 
       eventEdit.onDelete = (id) => {
-        eventEditOnDelete (id, tripData, header, eventEdit, eventsContainer, destinations);
+        eventEditOnDelete(id, tripData, header, eventEdit, eventsContainer, destinations, sortMethod);
       };
 
       currentDay.itemsElement.appendChild(event.render());

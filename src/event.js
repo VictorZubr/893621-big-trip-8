@@ -32,7 +32,9 @@ export default class Event extends Component {
 
   _getFormattedDuration(ms) {
     const days = moment.duration(ms).days();
-    return `${days > 0 ? days + `D ` : ``}${moment.duration(ms).hours()}H ${moment.duration(ms).minutes()}M`;
+    const months = moment.duration(ms).months();
+    const years = moment.duration(ms).years();
+    return `${years > 0 ? years + `Y ` : ``}${months > 0 ? months + `M ` : ``}${days > 0 ? days + `D ` : ``}${moment.duration(ms).hours()}H ${moment.duration(ms).minutes()}M`;
   }
 
   _getFormattedTime(ms) {

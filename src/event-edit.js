@@ -1,8 +1,9 @@
-import {ADDITIONAL_POINTS, POINT_TYPES} from './const';
+import {ADDITIONAL_POINTS, POINT_TYPES, SHAKE_TIME} from './const';
 import Componenet from './component';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
-import {createElement} from './utils';
+import {createElement, shake} from './utils';
+const ERROR_STYLE = `border: 1px solid red;`;
 
 export default class EventEdit extends Componenet {
   constructor(data, parent) {
@@ -40,6 +41,7 @@ export default class EventEdit extends Componenet {
     this._onDeleteButtonClickBound = this._onDeleteButtonClick.bind(this);
     this._onChangeDestinationBound = this._onDestinationChange.bind(this);
     this._onEscKeyupBound = this._onEscKeyup.bind(this);
+    this._onPriceInputBound = this._getOnlyDigits.bind(this);
   }
 
   _getFormattedDate(ms) {
@@ -122,8 +124,8 @@ export default class EventEdit extends Componenet {
       </div>
       <div class="point__time">
         choose time
-        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateBegin)}" name="date-start" placeholder="19:00">
-        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateEnd)}" name="date-end" placeholder="21:00">
+        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateBegin)}" name="date-start" placeholder="${(moment(this._dateBegin).isValid()) ? this._getFormattedTime(this._dateBegin): this._getFormattedTime(Date.now())} —">
+        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateEnd)}" name="date-end" placeholder="${(moment(this._dateEnd).isValid()) ? this._getFormattedTime(this._dateEnd): this._getFormattedTime(Date.now())}">
       </div>
 
       <label class="point__price">
@@ -222,8 +224,35 @@ export default class EventEdit extends Componenet {
     return entry;
   }
 
+  _markAsError(elementForStyle, elementForFocus = elementForStyle) {
+    elementForStyle.style = ERROR_STYLE;
+    elementForFocus.focus();
+    return false;
+  }
+
+  _isValidForm() {
+    if (this._destinations.findIndex((it) => it.name === this._destinationElement.value) < 0) {
+      return this._markAsError(this._destinationElement);
+    }
+    if (typeof this._dateBegin === `undefined` || !moment(this._dateBegin).isValid()) {
+         return this._markAsError(this._dateBeginFlatpickr.altInput, this._dateBeginElement);
+    }
+    if (typeof this._dateEnd === `undefined` || !moment(this._dateEnd).isValid()) {
+      return this._markAsError(this._dateEndFlatpickr.altInput, this._dateEndElement);
+    }
+    if (isNaN(this._priceInputElement.value) || Number(this._priceInputElement.value) < 0) {
+      return this._markAsError(this._priceInputElement);
+    }
+    return true;
+  }
+
   _onFormSubmit(evt) {
     evt.preventDefault();
+    if (!this._isValidForm()) {
+      shake(this._element, SHAKE_TIME);
+      return;
+    }
+
     const formData = new FormData(this._formElement);
     const newData = this._processForm(formData);
 
@@ -254,8 +283,11 @@ export default class EventEdit extends Componenet {
     }
   }
 
+  _getOnlyDigits(evt) {
+    evt.target.value = evt.target.value.replace(/\D+/g, '')
+  }
+
   set onEsc(fn) {
-    console.log(fn);
     this._onEsc = fn;
   }
 
@@ -290,14 +322,16 @@ export default class EventEdit extends Componenet {
         {
           mode: `single`,
           enableTime: true,
-          dateFormat: `d m H:i`,
-          altFormat: `H:i`,
+          dateFormat: `d m Y H:i`,
+          altFormat: `H:i —`,
           altInput: true,
           defaultDate: this._dateBegin,
           maxDate: this._dateEnd,
-          onChange: (dates) => {
+          minDate: Date.now() - moment.duration(3, 'years'),
+          onClose: (dates) => {
             this._dateBegin = +moment(dates[0]);
             this._dateEndFlatpickr.config.minDate = this._dateBegin;
+            this._dateBeginFlatpickr.altInput.style = ``;
           }
         });
 
@@ -306,19 +340,24 @@ export default class EventEdit extends Componenet {
         {
           mode: `single`,
           enableTime: true,
-          dateFormat: `d m H:i`,
+          dateFormat: `d m Y H:i`,
           altFormat: `H:i`,
           altInput: true,
           defaultDate: this._dateEnd,
           minDate: this._dateBegin,
-          onChange: (dates) => {
+          maxDate: Date.now() + moment.duration(3, 'years'),
+          onClose: (dates) => {
             this._dateEnd = +moment(dates[0]);
             this._dateBeginFlatpickr.config.maxDate = this._dateEnd;
+            this._dateEndFlatpickr.altInput.style = ``;
           }
         });
 
     this._deleteButtonElement = this._formElement.querySelector(`.point__button[type="reset"]`);
     this._deleteButtonElement.addEventListener(`click`, this._onDeleteButtonClickBound);
+
+    this._priceInputElement = this._formElement.querySelector(`input[name="price"]`);
+    this._priceInputElement.addEventListener(`input`, this._onPriceInputBound);
 
     document.addEventListener(`keyup`, this._onEscKeyupBound);
   }
@@ -373,13 +412,13 @@ export default class EventEdit extends Componenet {
         target.title = value;
       },
       'date-start': (value) => {
-        target.dateBegin += +moment(value, `DD MM hh:mm a`);
+        target.dateBegin += +moment(value, `DD MM YYYY hh:mm a`);
       },
       'date-end': (value) => {
-        target.dateEnd += +moment(value, `DD MM hh:mm a`);
+        target.dateEnd += +moment(value, `DD MM YYYY hh:mm a`);
       },
       'price': (value) => {
-        target.price = value;
+        target.price = +value;
       },
       'favorite': (value) => {
         target.isFavorite = value === `on`;

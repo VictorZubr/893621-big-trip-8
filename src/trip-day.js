@@ -13,7 +13,6 @@ export default class TripDay extends Component {
   }
 
   get template() {
-    //debugger;
     return `<section class="trip-day">
       <article class="trip-day__info">
         <span class="trip-day__caption">Day</span>

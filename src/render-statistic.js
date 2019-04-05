@@ -40,11 +40,6 @@ export default (tripdata, header, container) => {
   const moneyStatisticData = getChartDataObject(clipSortedItems(statSums, POINT_TYPES), `money`);
   moneyStatisticData.formatter = `€ `;
   const moneyStatistic = new Statistic(moneyStatisticData);
-  moneyStatistic.onUpdate = () => {
-
-  };
-
-  container.appendChild(moneyStatistic.render());
 
   const transportStatisticData = getChartDataObject(
       clipSortedItems(statCounts, POINT_TYPES).filter((element) => element[1].text.lastIndexOf(` to`) > 0)
@@ -52,5 +47,10 @@ export default (tripdata, header, container) => {
   );
   transportStatisticData.formatter = ``;
   const transportStatistic = new Statistic(transportStatisticData);
+
+  const moneyStatistic2 = new Statistic(moneyStatisticData);
+
+  container.appendChild(moneyStatistic.render());
   container.appendChild(transportStatistic.render());
+  container.appendChild(moneyStatistic2.render());
 };

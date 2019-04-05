@@ -7,6 +7,7 @@ export const MILLISECONDS_IN_DAY = 24 * MILLISECONDS_IN_HOUR;
 export const ADDITIONAL_POINTS = [`airport`, `hotel`];
 export const WAIT_TEXT = `Loading route...`;
 export const LOAD_ERROR_TEXT = `Something went wrong while loading your route info. Check your connection or try again later.`;
+export const SHAKE_TIME = 1000;
 
 export const POINT_TYPES = [
   {name: `taxi`, icon: `🚕`, text: `Taxi to`, group: 1},
@@ -22,9 +23,9 @@ export const POINT_TYPES = [
 ];
 
 export const sort = {
-  EVENT: `event`,
-  TIME: `time`,
-  PRICE: `price`
+  EVENT: `sorting-event`,
+  TIME: `sorting-time`,
+  PRICE: `sorting-price`
 };
 
 export const OFFERS = [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`];
