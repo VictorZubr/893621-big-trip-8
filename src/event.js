@@ -47,7 +47,8 @@ export default class Event extends Component {
 
   _getOffersHTML() {
     return this._offers
-      .map((element) => element.checked ? `<li><button class="trip-point__offer">${element.name} +&euro; ${element.price}</button></li>` : ``)
+      .filter((it) => it.checked).slice(0, 3)
+      .map((element) => `<li><button class="trip-point__offer">${element.name} +&euro; ${element.price}</button></li>`)
       .join(``);
   }
 

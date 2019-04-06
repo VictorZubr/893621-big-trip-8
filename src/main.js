@@ -43,6 +43,7 @@ const getTrip = (events, destinations, offers) => {
       type.offers = findedOffers.offers;
     }
   });
+
   // Не знаем, в каком виде придут события от сервера, поэтому на всякий случай отсортируем.
   const newEvents = events.sort((a, b) => a.dateBegin - b.dateBegin);
   const route = newEvents.map((element) => element.title);
@@ -50,6 +51,19 @@ const getTrip = (events, destinations, offers) => {
   newEvents.forEach((element) => {
     element.tripRoute = route;
     element.destinations = destinations;
+
+    // Необходимо актуализировать доп.предложния, дополнив невыбранные из справочника offers. при этом у них может быть разная цена.
+    // Оставляем ту, что в этом событии.
+    const tempArray = element.offers.map((it) => it);
+    element.offers = element.type.offers.map((offer) => {
+      const newOffer = Object.assign({}, offer);
+      const findedOffer = tempArray.find((it) => it.name === offer.name);
+      if (typeof findedOffer !== `undefined`) {
+        newOffer.price = findedOffer.price;
+        newOffer.checked = findedOffer.checked;
+      }
+      return newOffer;
+    });
   });
   return {
     title,
@@ -81,15 +95,15 @@ let header;
 
 tripContainer.innerHTML = WAIT_TEXT;
 
-const AUTHORIZATION = `Basic e466t3uu77y7urdbq6;37j3g2ir9yZAo`;
+const AUTHORIZATION = `Basic e466t53uu77y7u0rdbq6;37j3g2ir9yZAo`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 Promise.all([api.getOffers(), api.getDestinations(), api.getEvents()])
   .then(([offersArray, destinationsArray, events]) => {
-    offers = offersArray;
-    destinations = destinationsArray;
-    initialTrip = getTrip(events, destinations, offers);
+    offers = offersArray.map((it) => Object.assign({}, it));
+    destinations = destinationsArray.map((it) => it);
+    initialTrip = getTrip(events, destinations, offersArray);
     filteredTrip = copyTrip(initialTrip);
     header = renderHeader(filteredTrip, tripHeaderContainer);
     renderTrip(filteredTrip, header, tripContainer, destinations, Sort.EVENT);
