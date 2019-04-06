@@ -199,7 +199,7 @@ export default class EventEdit extends Component {
   }
 
   _processForm(formData) {
-    const entry = {
+    const dataEntry = {
       title: ``,
       offers: this._offers.map((element) => {
         const newObj = Object.assign({}, element);
@@ -212,7 +212,7 @@ export default class EventEdit extends Component {
       dateEnd: 0
     };
 
-    const eventEditMapper = this._createMapper(entry);
+    const eventEditMapper = this._createMapper(dataEntry);
 
     for (const pair of formData.entries()) {
       const [property, value] = pair;
@@ -220,7 +220,7 @@ export default class EventEdit extends Component {
         eventEditMapper[property](value);
       }
     }
-    return entry;
+    return dataEntry;
   }
 
   _markAsError(elementForStyle, elementForFocus = elementForStyle) {
