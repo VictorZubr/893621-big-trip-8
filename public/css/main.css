@@ -66,6 +66,8 @@ a:hover {
 .trip__points {
   font-size: var(--font-size-bigger);
   margin: 0 0 5px;
+  overflow-y: hidden;
+  max-height: 55px;
 }
 
 .trip__schedule .trip-icon {
@@ -405,7 +407,7 @@ input[type=radio]:checked + .trip-sorting__item {
   padding: 0 2px 6px;
   outline: 0;
   border-bottom: 1px solid #0D8AE4;
-  width: 100%;
+  width: 50%;
   height: 23px;
   text-transform: uppercase;
   font-weight: normal;

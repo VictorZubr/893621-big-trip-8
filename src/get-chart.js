@@ -1,6 +1,8 @@
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
+const parseFormat = (str) => ({prefix: str.slice(0, str.indexOf(`X`)), postfix: str.slice(str.indexOf(`X`) + 1)});
+
 export default (ctx, config) => {
   return new Chart(ctx, {
     plugins: [ChartDataLabels],
@@ -15,7 +17,10 @@ export default (ctx, config) => {
           color: `#000000`,
           anchor: `end`,
           align: `start`,
-          formatter: (val) => `${config.formatter}${val}`
+          formatter: (val) => {
+            const format = parseFormat(config.formatter);
+            return `${format.prefix}${val}${format.postfix}`;
+          }
         }
       },
       title: {

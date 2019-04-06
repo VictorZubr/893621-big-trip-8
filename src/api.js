@@ -1,8 +1,9 @@
 import ModelEvent from './model-event';
 import ModelDestination from './model-destination';
 import ModelOffers from './model-offers';
+import {shake} from './utils';
+import {SHAKE_TIME} from './const';
 
-const SHAKE_TIME = 1000;
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -10,15 +11,20 @@ const Method = {
   DELETE: `DELETE`
 };
 
-const buttonText = {
+const ButtonText = {
   SAVE: `Save`,
   SAVING: `Saving...`,
   DELETE: `Delete`,
   DELETING: `Deleting...`
 };
 
+const ResponseStatus = {
+  OK: 200,
+  REDIRECTION: 300
+};
+
 const checkStatus = (response) => {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.status >= ResponseStatus.OK && response.status < ResponseStatus.REDIRECTION) {
     return response;
   } else {
     throw new Error(`${response.status}: ${response.statusText}`);
@@ -67,15 +73,8 @@ export default class API {
     element.style = `border: 3px solid red;`;
   }
 
-  _shake(element) {
-    element.classList.add(`shake`);
-    setTimeout(() => {
-      element.classList.remove(`shake`);
-    }, SHAKE_TIME);
-  }
-
-  updateEvent({id, data}, element) {
-    element.querySelector(`.point__button--save`).textContent = buttonText.SAVING;
+  updateEvent({id: id, data}, element) {
+    element.querySelector(`.point__button--save`).textContent = ButtonText.SAVING;
     this._blockEventEdit(element);
     return this._load({
       url: `points/${id}`,
@@ -87,23 +86,41 @@ export default class API {
       .then(ModelEvent.parseEvent)
       .catch((err) => {
         setTimeout(() => {
-          this._shake(element);
+          shake(element, SHAKE_TIME);
           this._unBlockEventEdit(element);
-          element.querySelector(`.point__button--save`).textContent = buttonText.SAVE;
+          element.querySelector(`.point__button--save`).textContent = ButtonText.SAVE;
         }, SHAKE_TIME);
         throw err;
       });
 
   }
 
-  deleteEvent(id, element) {
-    element.querySelector(`[type='reset']`).textContent = buttonText.DELETING;
+  deleteEvent({id}, element) {
+    element.querySelector(`[type='reset']`).textContent = ButtonText.DELETING;
     this._blockEventEdit(element);
     return this._load({url: `points/${id}`, method: Method.DELETE})
       .catch((err) => {
-        this._shake(element);
+        shake(element, SHAKE_TIME);
         this._unBlockEventEdit(element);
-        element.querySelector(`[type='reset']`).textContent = buttonText.DELETE;
+        element.querySelector(`[type='reset']`).textContent = ButtonText.DELETE;
+        throw err;
+      });
+  }
+
+  createEvent(event, element) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(event),
+      header: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON)
+      .catch((err) => {
+        setTimeout(() => {
+          shake(element, SHAKE_TIME);
+          this._unBlockEventEdit(element);
+          element.querySelector(`.point__button--save`).textContent = ButtonText.SAVE;
+        }, SHAKE_TIME);
         throw err;
       });
   }

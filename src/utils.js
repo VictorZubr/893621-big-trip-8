@@ -26,3 +26,10 @@ export const createElement = (template) => {
   newElement.innerHTML = template;
   return newElement.firstChild;
 };
+
+export const shake = (element, time) => {
+  element.classList.add(`shake`);
+  setTimeout(() => {
+    element.classList.remove(`shake`);
+  }, time);
+};

@@ -3,8 +3,9 @@ import Component from './component';
 import moment from 'moment';
 
 export default class Event extends Component {
-  constructor(data) {
+  constructor(data, parent) {
     super();
+    this._parent = parent;
     this._type = data.type;
     this._title = data.title;
     this._offers = data.offers.slice(0);
@@ -31,7 +32,9 @@ export default class Event extends Component {
 
   _getFormattedDuration(ms) {
     const days = moment.duration(ms).days();
-    return `${days > 0 ? days + `D ` : ``}${moment.duration(ms).hours()}H ${moment.duration(ms).minutes()}M`;
+    const months = moment.duration(ms).months();
+    const years = moment.duration(ms).years();
+    return `${years > 0 ? years + `Y ` : ``}${months > 0 ? months + `M ` : ``}${days > 0 ? days + `D ` : ``}${moment.duration(ms).hours()}H ${moment.duration(ms).minutes()}M`;
   }
 
   _getFormattedTime(ms) {
@@ -44,7 +47,8 @@ export default class Event extends Component {
 
   _getOffersHTML() {
     return this._offers
-      .map((element) => element.checked ? `<li><button class="trip-point__offer">${element.name} +&euro; ${element.price}</button></li>` : ``)
+      .filter((it) => it.checked).slice(0, 3)
+      .map((element) => `<li><button class="trip-point__offer">${element.name} +&euro; ${element.price}</button></li>`)
       .join(``);
   }
 
@@ -58,6 +62,10 @@ export default class Event extends Component {
 
   set index(num) {
     this._index = num;
+  }
+
+  get parent() {
+    return this._parent;
   }
 
   get template() {

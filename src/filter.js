@@ -33,6 +33,11 @@ export default class Filter extends Component {
     this._inputElement.addEventListener(`click`, this._onFilterClickBound);
   }
 
+  unbind() {
+    this._inputElement.removeEventListener(`click`, this._onFilterClickBound);
+    this._inputElement = null;
+  }
+
   render() {
     const element = document.createElement(`div`);
     element.innerHTML = this.template;
@@ -44,5 +49,4 @@ export default class Filter extends Component {
     this.bind();
     return this._element;
   }
-
 }

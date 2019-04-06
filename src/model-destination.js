@@ -3,7 +3,6 @@ export default class ModelDestination {
     this.name = data[`name`];
     this.description = data[`description`];
     this.pictures = data[`pictures`];
-
   }
 
   toRAW() {

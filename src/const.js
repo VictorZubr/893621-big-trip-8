@@ -5,8 +5,9 @@ export const MILLISECONDS_IN_MINUTE = 60 * 1000;
 export const MILLISECONDS_IN_HOUR = 60 * MILLISECONDS_IN_MINUTE;
 export const MILLISECONDS_IN_DAY = 24 * MILLISECONDS_IN_HOUR;
 export const ADDITIONAL_POINTS = [`airport`, `hotel`];
-export const WAIT_TEXT = `Loading route...`;
-export const LOAD_ERROR_TEXT = `Something went wrong while loading your route info. Check your connection or try again later.`;
+export const WAIT_TEXT = `<section class="trip-day" style="padding-left: 150px; font-weight: bold">Loading route...</section>`;
+export const LOAD_ERROR_TEXT = `<section class="trip-day" style="padding-left: 150px; font-weight: bold">Something went wrong while loading your route info. Check your connection or try again later.</section>`;
+export const SHAKE_TIME = 1000;
 
 export const POINT_TYPES = [
   {name: `taxi`, icon: `🚕`, text: `Taxi to`, group: 1},
@@ -20,6 +21,12 @@ export const POINT_TYPES = [
   {name: `sightseeing`, icon: `🏛️`, text: `Sightseeing`, group: 2},
   {name: `restaurant`, icon: `🍴`, text: `Restaurant`, group: 2}
 ];
+
+export const Sort = {
+  EVENT: `sorting-event`,
+  TIME: `sorting-time`,
+  PRICE: `sorting-price`
+};
 
 export const OFFERS = [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`];
 export const DESCRIPTION_TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`;
