@@ -1,10 +1,7 @@
-import {POINT_TYPES} from './const';
 import ModelEvent from './model-event';
 
-export default class ModelNewEvent{
+export default class ModelNewEvent {
   constructor(data) {
-    //super();
-    // this.id = data[`id`];
     this.type = data.type;
     this.title = data.title;
     this.photos = data.photos;
@@ -24,7 +21,6 @@ export default class ModelNewEvent{
         name: this.title,
         description: this.destination,
         pictures: [...this.photos],
-        //.map((it) => ({src: it}))
       },
       'offers': this.offers.map((it) => ({title: it.name, price: it.price, accepted: it.checked})),
       'base_price': this.price,

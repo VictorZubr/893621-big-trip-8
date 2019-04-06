@@ -3,7 +3,7 @@ import EventEdit from './event-edit';
 import {api} from './main';
 import TripDay from './trip-day';
 import moment from 'moment';
-import {sort} from './const';
+import {Sort} from './const';
 
 export const getTotal = (events) =>
   events.reduce((total, element) => +total + element.price + element.offers.reduce((acc, it) => it.checked ? +acc + it.price : acc, 0), 0);
@@ -61,7 +61,6 @@ const eventEditOnSubmit = (tripData, header, element, event, eventEdit, dayConta
         tripData.total = tripData.total - oldPrice + newPrice;
       }
       header.update(tripData);
-
     });
 };
 
@@ -88,7 +87,7 @@ const renderDay = (count, date, container) => {
   return tripDay;
 };
 
-export const renderTrip = (tripData, header, eventsContainer, destinations, sortMethod = sort.EVENT) => {
+export const renderTrip = (tripData, header, eventsContainer, destinations, sortMethod = Sort.EVENT) => {
   eventsContainer.innerHTML = ``;
   let currentDate = null;
   let currentCount = 0;
@@ -97,13 +96,12 @@ export const renderTrip = (tripData, header, eventsContainer, destinations, sort
     .filter((it) => !it.isDeleted)
     .sort((a, b) => {
       switch (sortMethod) {
-        case `sorting-event`:
-          return a.dateBegin - b.dateBegin;
-        case `sorting-time`:
+        case Sort.TIME:
           return (b.dateEnd - b.dateBegin) - (a.dateEnd - a.dateBegin);
-        case `sorting-price`:
+        case Sort.PRICE:
           return b.price - a.price;
       }
+      return a.dateBegin - b.dateBegin;
     })
     .forEach((element, index) => {
       // Если день другой, создаем новый контейнер дня

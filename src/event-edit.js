@@ -1,11 +1,11 @@
 import {ADDITIONAL_POINTS, POINT_TYPES, SHAKE_TIME} from './const';
-import Componenet from './component';
+import Component from './component';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
 import {createElement, shake} from './utils';
 const ERROR_STYLE = `border: 1px solid red;`;
 
-export default class EventEdit extends Componenet {
+export default class EventEdit extends Component {
   constructor(data, parent) {
     super();
     this._parent = parent;
@@ -124,8 +124,8 @@ export default class EventEdit extends Componenet {
       </div>
       <div class="point__time">
         choose time
-        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateBegin)}" name="date-start" placeholder="${(moment(this._dateBegin).isValid()) ? this._getFormattedTime(this._dateBegin): this._getFormattedTime(Date.now())} —">
-        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateEnd)}" name="date-end" placeholder="${(moment(this._dateEnd).isValid()) ? this._getFormattedTime(this._dateEnd): this._getFormattedTime(Date.now())}">
+        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateBegin)}" name="date-start" placeholder="${(moment(this._dateBegin).isValid()) ? this._getFormattedTime(this._dateBegin) : this._getFormattedTime(Date.now())} —">
+        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateEnd)}" name="date-end" placeholder="${(moment(this._dateEnd).isValid()) ? this._getFormattedTime(this._dateEnd) : this._getFormattedTime(Date.now())}">
       </div>
 
       <label class="point__price">
@@ -235,7 +235,7 @@ export default class EventEdit extends Componenet {
       return this._markAsError(this._destinationElement);
     }
     if (typeof this._dateBegin === `undefined` || !moment(this._dateBegin).isValid()) {
-         return this._markAsError(this._dateBeginFlatpickr.altInput, this._dateBeginElement);
+      return this._markAsError(this._dateBeginFlatpickr.altInput, this._dateBeginElement);
     }
     if (typeof this._dateEnd === `undefined` || !moment(this._dateEnd).isValid()) {
       return this._markAsError(this._dateEndFlatpickr.altInput, this._dateEndElement);
@@ -250,7 +250,7 @@ export default class EventEdit extends Componenet {
     evt.preventDefault();
     if (!this._isValidForm()) {
       shake(this._element, SHAKE_TIME);
-      return;
+      return false;
     }
 
     const formData = new FormData(this._formElement);
@@ -284,7 +284,7 @@ export default class EventEdit extends Componenet {
   }
 
   _getOnlyDigits(evt) {
-    evt.target.value = evt.target.value.replace(/\D+/g, '')
+    evt.target.value = evt.target.value.replace(/\D+/g, ``);
   }
 
   set onEsc(fn) {
@@ -327,7 +327,7 @@ export default class EventEdit extends Componenet {
           altInput: true,
           defaultDate: this._dateBegin,
           maxDate: this._dateEnd,
-          minDate: Date.now() - moment.duration(3, 'years'),
+          minDate: Date.now() - moment.duration(3, `years`),
           onClose: (dates) => {
             this._dateBegin = +moment(dates[0]);
             this._dateEndFlatpickr.config.minDate = this._dateBegin;
@@ -345,7 +345,7 @@ export default class EventEdit extends Componenet {
           altInput: true,
           defaultDate: this._dateEnd,
           minDate: this._dateBegin,
-          maxDate: Date.now() + moment.duration(3, 'years'),
+          maxDate: Date.now() + moment.duration(3, `years`),
           onClose: (dates) => {
             this._dateEnd = +moment(dates[0]);
             this._dateBeginFlatpickr.config.maxDate = this._dateEnd;
@@ -384,6 +384,8 @@ export default class EventEdit extends Componenet {
     this._deleteButtonElement.removeEventListener(`click`, this._onDeleteButtonClickBound);
     this._deleteButtonElement = null;
 
+    this._priceInputElement.removeEventListener(`input`, this._onPriceInputBound);
+    this._priceInputElement = null;
     document.removeEventListener(`keyup`, this._onEscKeyupBound);
   }
 
