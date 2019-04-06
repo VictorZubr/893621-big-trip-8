@@ -76,7 +76,6 @@ export default class API {
   // }
 
   updateEvent({id: id, data}, element) {
-    console.log(`ИД при изменении: `, id);
     element.querySelector(`.point__button--save`).textContent = buttonText.SAVING;
     this._blockEventEdit(element);
     return this._load({
@@ -99,7 +98,6 @@ export default class API {
   }
 
   deleteEvent({id}, element) {
-    debugger;
     element.querySelector(`[type='reset']`).textContent = buttonText.DELETING;
     this._blockEventEdit(element);
     return this._load({url: `points/${id}`, method: Method.DELETE})
@@ -112,7 +110,6 @@ export default class API {
   }
 
   createEvent(event) {
-    console.log(`Посылаем при создании: `, JSON.stringify(event));
     return this._load({
       url: `points`,
       method: Method.POST,
@@ -121,8 +118,6 @@ export default class API {
     })
       .then((resolve) => {
         const res = toJSON(resolve)
-        console.log(`ПОЛУЧАЕМ при создании: `, res);
-        //console.log(toJSON(resolve));
         return res;
       })
       //.then(ModelEvent.parseEvent);

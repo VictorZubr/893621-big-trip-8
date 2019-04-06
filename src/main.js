@@ -67,6 +67,7 @@ const getTrip = (events, destinations, offers) => {
   return {
     title,
     route,
+    destinations,
     events: newEvents,
     dateBegin: newEvents[0].dateBegin,
     dateEnd: newEvents[newEvents.length - 1].dateEnd,
@@ -102,7 +103,6 @@ Promise.all([api.getOffers(), api.getDestinations(), api.getEvents()])
   .then(([offersArray, destinationsArray, events]) => {
     offers = offersArray;
     destinations = destinationsArray;
-    console.log(destinations);
     initialTrip = getTrip(events, destinations, offers);
     filteredTrip = copyTrip(initialTrip);
     header = renderHeader(filteredTrip, tripHeaderContainer);
@@ -156,6 +156,7 @@ sortFormElement.addEventListener(`change`, onSortFormChange);
 
 
 const onNewEvenButtonClick = () => {
+  onTableClick();
   const data ={
     id: null,
     type: POINT_TYPES[0],

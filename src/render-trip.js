@@ -32,7 +32,6 @@ const eventEditOnSubmit = (tripData, header, element, event, eventEdit, dayConta
   const oldPrice = getPrice(element);
   const newPrice = getPrice(newObject);
   const oldDateBegin = element.dateBegin;
-  console.log(`Пришло в рендер: `, newObject.dateBegin)
   const newDateBegin = newObject.dateBegin;
   const isEventNameUpdated = element.title !== newObject.title;
   Object.assign(element, newObject);
