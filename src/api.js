@@ -11,15 +11,20 @@ const Method = {
   DELETE: `DELETE`
 };
 
-const buttonText = {
+const ButtonText = {
   SAVE: `Save`,
   SAVING: `Saving...`,
   DELETE: `Delete`,
   DELETING: `Deleting...`
 };
 
+const ResponseStatus = {
+  OK: 200,
+  REDIRECTION: 300
+};
+
 const checkStatus = (response) => {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.status >= ResponseStatus.OK && response.status < ResponseStatus.REDIRECTION) {
     return response;
   } else {
     throw new Error(`${response.status}: ${response.statusText}`);
@@ -68,15 +73,8 @@ export default class API {
     element.style = `border: 3px solid red;`;
   }
 
-  // _shake(element) {
-  //   element.classList.add(`shake`);
-  //   setTimeout(() => {
-  //     element.classList.remove(`shake`);
-  //   }, SHAKE_TIME);
-  // }
-
   updateEvent({id: id, data}, element) {
-    element.querySelector(`.point__button--save`).textContent = buttonText.SAVING;
+    element.querySelector(`.point__button--save`).textContent = ButtonText.SAVING;
     this._blockEventEdit(element);
     return this._load({
       url: `points/${id}`,
@@ -90,7 +88,7 @@ export default class API {
         setTimeout(() => {
           shake(element, SHAKE_TIME);
           this._unBlockEventEdit(element);
-          element.querySelector(`.point__button--save`).textContent = buttonText.SAVE;
+          element.querySelector(`.point__button--save`).textContent = ButtonText.SAVE;
         }, SHAKE_TIME);
         throw err;
       });
@@ -98,41 +96,34 @@ export default class API {
   }
 
   deleteEvent({id}, element) {
-    element.querySelector(`[type='reset']`).textContent = buttonText.DELETING;
+    element.querySelector(`[type='reset']`).textContent = ButtonText.DELETING;
     this._blockEventEdit(element);
     return this._load({url: `points/${id}`, method: Method.DELETE})
       .catch((err) => {
         shake(element, SHAKE_TIME);
         this._unBlockEventEdit(element);
-        element.querySelector(`[type='reset']`).textContent = buttonText.DELETE;
+        element.querySelector(`[type='reset']`).textContent = ButtonText.DELETE;
         throw err;
       });
   }
 
-  createEvent(event) {
+  createEvent(event, element) {
     return this._load({
       url: `points`,
       method: Method.POST,
       body: JSON.stringify(event),
       header: new Headers({'Content-Type': `application/json`})
     })
-      .then((resolve) => {
-        const res = toJSON(resolve)
-        return res;
-      })
-      //.then(ModelEvent.parseEvent);
+      .then(toJSON)
+      .catch((err) => {
+        setTimeout(() => {
+          shake(element, SHAKE_TIME);
+          this._unBlockEventEdit(element);
+          element.querySelector(`.point__button--save`).textContent = ButtonText.SAVE;
+        }, SHAKE_TIME);
+        throw err;
+      });
   }
-
-  // createTask({task}) {
-  //   return this._load({
-  //     url: `tasks`,
-  //     method: Method.POST,
-  //     body: JSON.stringify(task),
-  //     headers: new Headers({'Content-Type': `application/json`})
-  //   })
-  //     .then(toJSON)
-  //     .then(ModelTask.parseTask);
-  // }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);

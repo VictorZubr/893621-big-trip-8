@@ -1,29 +1,16 @@
-import {WAIT_TEXT, LOAD_ERROR_TEXT, POINT_TYPES, sort} from './const';
+import {WAIT_TEXT, LOAD_ERROR_TEXT, POINT_TYPES, Sort} from './const';
 import Header from './header';
 import Filter from './filter';
 import {renderTrip, getTotal} from './render-trip';
 import renderStatistic from './render-statistic';
 import API from './api';
 import EventEdit from './event-edit';
-import ModelEvent from "./model-event";
 import ModelNewEvent from './model-new-event';
 
 const FILTERS_DATA = [
-  {
-    label: `Everything`,
-    isChecked: true,
-    filter: (events) => events.filter(() => true)
-  },
-  {
-    label: `Future`,
-    isChecked: false,
-    filter: (events) => events.filter((it) => it.dateBegin > Date.now())
-  },
-  {
-    label: `Past`,
-    isChecked: false,
-    filter: (events) => events.filter((it) => it.dateBegin < Date.now())
-  },
+  {label: `Everything`, isChecked: true, filter: (events) => events.filter(() => true)},
+  {label: `Future`, isChecked: false, filter: (events) => events.filter((it) => it.dateBegin > Date.now())},
+  {label: `Past`, isChecked: false, filter: (events) => events.filter((it) => it.dateBegin < Date.now())},
 ];
 
 const filtersContainer = document.querySelector(`.trip-filter`);
@@ -49,7 +36,7 @@ const copyTrip = (trip) => {
 // Функция возвращает объкт, содержащий данные о всей поездке вцелом
 
 const getTrip = (events, destinations, offers) => {
-  // Каждому типу событий добавляем соответствующие доп.предложения
+  // Актуализируем справочник пипов событий. Каждому типу событий добавляем соответствующие доп.предложения
   POINT_TYPES.forEach((type) => {
     const findedOffers = offers.find((it) => type.name === it.type);
     if (typeof findedOffers !== `undefined`) {
@@ -76,7 +63,6 @@ const getTrip = (events, destinations, offers) => {
 };
 
 const renderHeader = (tripData, headerContainer) => {
-  //headerContainer.innerHTML = ``;
   const header = new Header(tripData);
   const nextSiblingElement = headerContainer.querySelector(`section.trip-controls`);
   headerContainer.insertBefore(header.render(), nextSiblingElement);
@@ -95,7 +81,7 @@ let header;
 
 tripContainer.innerHTML = WAIT_TEXT;
 
-const AUTHORIZATION = `Basic j0ax7rthhe66t3uu77y7urdbq6;37j3g2ir9yZAo`;
+const AUTHORIZATION = `Basic e466t3uu77y7urdbq6;37j3g2ir9yZAo`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
@@ -106,13 +92,10 @@ Promise.all([api.getOffers(), api.getDestinations(), api.getEvents()])
     initialTrip = getTrip(events, destinations, offers);
     filteredTrip = copyTrip(initialTrip);
     header = renderHeader(filteredTrip, tripHeaderContainer);
-    renderTrip(filteredTrip, header, tripContainer, destinations, sort.EVENT);
+    renderTrip(filteredTrip, header, tripContainer, destinations, Sort.EVENT);
     renderStatistic(filteredTrip, header, statisticContainer);
   })
-  .catch((err) => {
-    console.log(err);
-    tripContainer.innerHTML = LOAD_ERROR_TEXT;
-  });
+  .catch(tripContainer.innerHTML = LOAD_ERROR_TEXT);
 
 const tableButtonElement = document.querySelector(`nav.trip-controls__menus a:first-child`);
 const statsButtonElement = document.querySelector(`nav.trip-controls__menus a:nth-child(2)`);
@@ -123,7 +106,6 @@ const onStatisticClick = () => {
   renderStatistic(filteredTrip, header, statisticContainer);
   mainContainer.classList.add(`visually-hidden`);
   tableButtonElement.classList.remove(`view-switch__item--active`);
-
   statisticContainer.classList.remove(`visually-hidden`);
   statsButtonElement.classList.add(`view-switch__item--active`);
 };
@@ -131,21 +113,20 @@ const onStatisticClick = () => {
 const onTableClick = () => {
   statisticContainer.classList.add(`visually-hidden`);
   statsButtonElement.classList.remove(`view-switch__item--active`);
-
   mainContainer.classList.remove(`visually-hidden`);
   tableButtonElement.classList.add(`view-switch__item--active`);
 };
 
 const onSortFormChange = (evt) => {
   switch (evt.target.id) {
-    case `sorting-event`:
-      renderTrip(filteredTrip, header, tripContainer, destinations, sort.EVENT);
+    case Sort.EVENT:
+      renderTrip(filteredTrip, header, tripContainer, destinations, Sort.EVENT);
       break;
-    case `sorting-time`:
-      renderTrip(filteredTrip, header, tripContainer, destinations, sort.TIME);
+    case Sort.TIME:
+      renderTrip(filteredTrip, header, tripContainer, destinations, Sort.TIME);
       break;
-    case `sorting-price`:
-      renderTrip(filteredTrip, header, tripContainer, destinations, sort.PRICE);
+    case Sort.PRICE:
+      renderTrip(filteredTrip, header, tripContainer, destinations, Sort.PRICE);
       break;
   }
 };
@@ -157,7 +138,7 @@ sortFormElement.addEventListener(`change`, onSortFormChange);
 
 const onNewEvenButtonClick = () => {
   onTableClick();
-  const data ={
+  const data = {
     id: null,
     type: POINT_TYPES[0],
     title: ``,
@@ -186,22 +167,18 @@ const onNewEvenButtonClick = () => {
     newEvent.destination = destination.description;
     newEvent.photos = destination.pictures;
     const sendObj = newEvent.toRAW();
-    api.createEvent(sendObj)
-      .then((idResolve) => {
-        // При создании поинта возвращается только один id, поэтому вторым запросом отсылаю PUT запрос на редактирование
-        api.updateEvent({id: idResolve.id, data: sendObj}, eventEdit.element)
-          .then((newEvent) => {
-            initialTrip.events.push(newEvent);
-            initialTrip = getTrip(initialTrip.events, destinations, offers);
-            filteredTrip = copyTrip(initialTrip);
-            header.update(filteredTrip);
-            renderTrip(filteredTrip, header, tripContainer, destinations, sort.EVENT);
-            renderStatistic(filteredTrip, header, statisticContainer);
-          })
-      })
+    // При создании поинта возвращается только один id, поэтому вторым запросом отсылаю PUT-запрос на редактирование
+    api.createEvent(sendObj, eventEdit.element)
+      .then((idResolve) => api.updateEvent({id: idResolve.id, data: sendObj}, eventEdit.element))
+      .then((newPoint) => {
+        initialTrip.events.push(newPoint);
+        initialTrip = getTrip(initialTrip.events, destinations, offers);
+        filteredTrip = copyTrip(initialTrip);
+        header.update(filteredTrip);
+        renderTrip(filteredTrip, header, tripContainer, destinations, getSortMethod(sortButtonsElements));
+        renderStatistic(filteredTrip, header, statisticContainer);
+      });
   };
-
-
 };
 
 const newEventButtonElement = tripHeaderContainer.querySelector(`.trip-controls__new-event`);
