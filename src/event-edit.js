@@ -202,8 +202,7 @@ export default class EventEdit extends Component {
     const entry = {
       title: ``,
       offers: this._offers.map((element) => {
-        const newObj = {};
-        Object.assign(newObj, element);
+        const newObj = Object.assign({}, element);
         newObj.checked = false;
         return newObj;
       }),

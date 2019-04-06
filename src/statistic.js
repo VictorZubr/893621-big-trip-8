@@ -11,6 +11,7 @@ export default class Statistic extends Component {
     this._onUpdate = null;
     this._ctx = null;
     this._chart = null;
+    this._statsButtonElement = null;
     this._onStatsButtonClickBound = this._onStatsButtonClick.bind(this);
 
   }
@@ -31,5 +32,13 @@ export default class Statistic extends Component {
 
     this._statsButtonElement = document.querySelector(`nav.trip-controls__menus a:nth-child(2)`);
     this._statsButtonElement.addEventListener(`click`, this._onStatsButtonClickBound);
+  }
+
+  unbind() {
+    this._chart.destroy();
+    this._ctx = null;
+
+    this._statsButtonElement.removeEventListener(`click`, this._onStatsButtonClickBound);
+    this._statsButtonElement = null;
   }
 }

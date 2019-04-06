@@ -95,7 +95,7 @@ let header;
 
 tripContainer.innerHTML = WAIT_TEXT;
 
-const AUTHORIZATION = `Basic e466t53uu77y7u0rdbq6;37j3g2ir9yZAo`;
+const AUTHORIZATION = `Basic 3uu77y7u0rdbq6;37j3g92ir9yZAo`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
