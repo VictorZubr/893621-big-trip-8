@@ -3,6 +3,7 @@ import Component from './component';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
 import {createElement, shake} from './utils';
+
 const ERROR_STYLE = `border: 1px solid red;`;
 
 export default class EventEdit extends Component {

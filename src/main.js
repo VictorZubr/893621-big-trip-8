@@ -55,15 +55,19 @@ const getTrip = (events, destinations, offers) => {
     // Необходимо актуализировать доп.предложния, дополнив невыбранные из справочника offers. при этом у них может быть разная цена.
     // Оставляем ту, что в этом событии.
     const tempArray = element.offers.map((it) => it);
-    element.offers = element.type.offers.map((offer) => {
-      const newOffer = Object.assign({}, offer);
-      const findedOffer = tempArray.find((it) => it.name === offer.name);
-      if (typeof findedOffer !== `undefined`) {
-        newOffer.price = findedOffer.price;
-        newOffer.checked = findedOffer.checked;
-      }
-      return newOffer;
-    });
+    if (typeof element.type.offers === `undefined`) {
+      element.offers = [];
+    } else {
+      element.offers = element.type.offers.map((offer) => {
+        const newOffer = Object.assign({}, offer);
+        const findedOffer = tempArray.find((it) => it.name === offer.name);
+        if (typeof findedOffer !== `undefined`) {
+          newOffer.price = findedOffer.price;
+          newOffer.checked = findedOffer.checked;
+        }
+        return newOffer;
+      });
+    }
   });
   return {
     title,
@@ -95,7 +99,7 @@ let header;
 
 tripContainer.innerHTML = WAIT_TEXT;
 
-const AUTHORIZATION = `Basic 3uu824638d0048sh56sh`;
+const AUTHORIZATION = `Basic y3uu824638d0z048szh56sh`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
