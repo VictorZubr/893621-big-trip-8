@@ -64,9 +64,10 @@ const eventEditOnSubmit = (tripData, header, element, event, eventEdit, dayConta
     });
 };
 
-const eventEditOnReset = (event, eventEdit, eventsContainer) => {
+const eventEditOnReset = (element, event, eventEdit, eventsContainer) => {
   event.render();
   eventsContainer.replaceChild(event.element, eventEdit.element);
+  eventEdit.update(element);
   eventEdit.unrender();
 };
 
@@ -123,11 +124,11 @@ export const renderTrip = (tripData, header, eventsContainer, destinations, sort
       };
 
       eventEdit.onReset = () => {
-        eventEditOnReset(event, eventEdit, currentDay.itemsElement);
+        eventEditOnReset(element, event, eventEdit, currentDay.itemsElement);
       };
 
       eventEdit.onEsc = () => {
-        eventEditOnReset(event, eventEdit, currentDay.itemsElement);
+        eventEditOnReset(element, event, eventEdit, currentDay.itemsElement);
       };
 
       eventEdit.onDelete = (id) => {
