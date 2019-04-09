@@ -1,5 +1,5 @@
 import Component from './component';
-import {createElement} from "./utils";
+import {createComponentElement} from "./utils";
 
 export default class Header extends Component {
   constructor(data) {
@@ -22,7 +22,7 @@ export default class Header extends Component {
 
   _partialUpdate() {
     this.unbind();
-    this._element.innerHTML = createElement(this.template).innerHTML;
+    this._element.innerHTML = createComponentElement(this.template).innerHTML;
     this.bind();
   }
 

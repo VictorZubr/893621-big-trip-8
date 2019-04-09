@@ -1,4 +1,4 @@
-import {createElement} from './utils';
+import {createComponentElement} from './utils';
 
 export default class Component {
   constructor() {
@@ -23,7 +23,7 @@ export default class Component {
   }
 
   render() {
-    this._element = createElement(this.template);
+    this._element = createComponentElement(this.template);
     this.bind();
     return this._element;
   }
