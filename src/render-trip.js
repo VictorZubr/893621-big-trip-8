@@ -111,9 +111,9 @@ export const renderTrip = (tripData, header, eventsContainer, destinations, sort
       currentDate = element.dateBegin;
       pastDay = currentDay;
 
-      const event = new Event(element, currentDay.element);
-      const eventEdit = new EventEdit(element, currentDay.element);
-      event.index = eventEdit.index = index;
+      const event = new Event(element);
+      const eventEdit = new EventEdit(element);
+      eventEdit.index = index;
 
       event.onEdit = () => {
         eventOnEdit(event, eventEdit, currentDay.itemsElement);

@@ -1,11 +1,9 @@
-import {MILLISECONDS_IN_MINUTE, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY} from "./const";
 import Component from './component';
 import moment from 'moment';
 
 export default class Event extends Component {
-  constructor(data, parent) {
+  constructor(data) {
     super();
-    this._parent = parent;
     this._type = data.type;
     this._title = data.title;
     this._offers = data.offers.slice(0);
@@ -16,18 +14,6 @@ export default class Event extends Component {
     this._index = null;
     this._onEdit = null;
     this._onEditButtonClickBound = this._onEditButtonClick.bind(this);
-  }
-
-  _getDuration(ms) {
-    const days = Math.floor(ms / MILLISECONDS_IN_DAY);
-    const hours = Math.floor((ms - days * MILLISECONDS_IN_DAY) / MILLISECONDS_IN_HOUR);
-    const minutes = Math.floor((ms - days * MILLISECONDS_IN_DAY - hours * MILLISECONDS_IN_HOUR) / MILLISECONDS_IN_MINUTE);
-
-    return {days, hours, minutes};
-  }
-
-  _getFormattedDate(ms) {
-    return moment(ms).format(`DD MMMM`);
   }
 
   _getFormattedDuration(ms) {
@@ -58,14 +44,6 @@ export default class Event extends Component {
 
   set onEdit(fn) {
     this._onEdit = fn;
-  }
-
-  set index(num) {
-    this._index = num;
-  }
-
-  get parent() {
-    return this._parent;
   }
 
   get template() {

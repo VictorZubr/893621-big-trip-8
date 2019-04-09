@@ -2,14 +2,13 @@ import {ADDITIONAL_POINTS, POINT_TYPES, SHAKE_TIME} from './const';
 import Component from './component';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
-import {createElement, shake} from './utils';
+import {createComponentElement, shake} from './utils';
 
 const ERROR_STYLE = `border: 1px solid red;`;
 
 export default class EventEdit extends Component {
-  constructor(data, parent) {
+  constructor(data) {
     super();
-    this._parent = parent;
     this._id = data.id;
     this._type = data.type;
     this._title = data.title;
@@ -89,10 +88,6 @@ export default class EventEdit extends Component {
             value="${element.name}">
        <label class="travel-way__select-label" for="travel-way-${element.name}-${this._index}">${element.icon} ${element.name}</label>`
     ).join(``);
-  }
-
-  get parent() {
-    return this._parent;
   }
 
   get template() {
@@ -303,10 +298,6 @@ export default class EventEdit extends Component {
     this._onReset = fn;
   }
 
-  set index(num) {
-    this._index = num;
-  }
-
   bind() {
     this._formElement = this._element.querySelector(`form`);
     this._formElement.addEventListener(`submit`, this._onFormSubmitBound);
@@ -401,7 +392,7 @@ export default class EventEdit extends Component {
 
   _partialUpdate() {
     this.unbind();
-    this._element.innerHTML = createElement(this.template).innerHTML;
+    this._element.innerHTML = createComponentElement(this.template).innerHTML;
     this.bind();
   }
 
