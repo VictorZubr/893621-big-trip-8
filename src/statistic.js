@@ -8,36 +8,24 @@ export default class Statistic extends Component {
     this._formatter = data.formatter;
     this._data = data.data;
 
-    this._onUpdate = null;
     this._ctx = null;
     this._chart = null;
-    this._statsButtonElement = null;
-    this._onStatsButtonClickBound = this._onStatsButtonClick.bind(this);
   }
 
   get template() {
-    return `<div class="statistic__item statistic__item--${this._title.toLowerCase()}">
-    <canvas class="statistic__${this._title.toLowerCase()}" width="900"></canvas>
+    const joinedTitle = this._title.toLowerCase().split(` `).join(`-`);
+    return `<div class="statistic__item statistic__item--${joinedTitle}">
+    <canvas class="statistic__${joinedTitle}" width="900"></canvas>
   </div>`;
-  }
-
-  _onStatsButtonClick() {
-    return typeof this._onUpdate === `function` && this._onUpdate();
   }
 
   bind() {
     this._ctx = this.element.querySelector(`canvas`);
     this._chart = getChart(this._ctx, {title: this._title, data: this._data, formatter: this._formatter});
-
-    this._statsButtonElement = document.querySelector(`nav.trip-controls__menus a:nth-child(2)`);
-    this._statsButtonElement.addEventListener(`click`, this._onStatsButtonClickBound);
   }
 
   unbind() {
     this._chart.destroy();
     this._ctx = null;
-
-    this._statsButtonElement.removeEventListener(`click`, this._onStatsButtonClickBound);
-    this._statsButtonElement = null;
   }
 }
