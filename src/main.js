@@ -155,6 +155,7 @@ sortFormElement.addEventListener(`change`, onSortFormChange);
 
 
 const onNewEvenButtonClick = () => {
+  newEventButtonElement.disabled = true;
   onTableClick();
   const data = {
     id: null,
@@ -177,6 +178,7 @@ const onNewEvenButtonClick = () => {
   eventEdit.onEsc = eventEdit.onDelete = () => {
     container.removeChild(eventEdit.element);
     eventEdit.unrender();
+    newEventButtonElement.disabled = false;
   };
 
   eventEdit.onSubmit = (newObject) => {
@@ -195,6 +197,7 @@ const onNewEvenButtonClick = () => {
         header.update(filteredTrip);
         renderTrip(filteredTrip, header, tripContainer, destinations, getSortMethod(sortButtonsElements));
         renderStatistic(filteredTrip, header, statisticContainer);
+        newEventButtonElement.disabled = false;
       });
   };
 };
