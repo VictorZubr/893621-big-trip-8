@@ -58,20 +58,6 @@ export default class API {
       .then(ModelOffers.parseOffers);
   }
 
-  static blockEventEdit(element) {
-    element.style = ``;
-    element.querySelector(`.point__destination-input`).disabled = true;
-    element.querySelector(`.point__button--save`).disabled = true;
-    element.querySelector(`[type='reset']`).disabled = true;
-  }
-
-  static unBlockEventEdit(element) {
-    element.querySelector(`[type='reset']`).disabled = false;
-    element.querySelector(`.point__button--save`).disabled = false;
-    element.querySelector(`.point__destination-input`).disabled = false;
-    element.style = `border: 3px solid red;`;
-  }
-
   updateEvent({id: id, data}, element) {
     element.querySelector(`.point__button--save`).textContent = ButtonText.SAVING;
     API.blockEventEdit(element);
@@ -131,5 +117,19 @@ export default class API {
       .catch((err) => {
         throw err;
       });
+  }
+
+  static blockEventEdit(element) {
+    element.style = ``;
+    element.querySelector(`.point__destination-input`).disabled = true;
+    element.querySelector(`.point__button--save`).disabled = true;
+    element.querySelector(`[type='reset']`).disabled = true;
+  }
+
+  static unBlockEventEdit(element) {
+    element.querySelector(`[type='reset']`).disabled = false;
+    element.querySelector(`.point__button--save`).disabled = false;
+    element.querySelector(`.point__destination-input`).disabled = false;
+    element.style = `border: 3px solid red;`;
   }
 }

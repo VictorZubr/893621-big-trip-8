@@ -15,14 +15,14 @@ export default class Statistic extends Component {
     this._onStatsButtonClickBound = this._onStatsButtonClick.bind(this);
   }
 
-  _onStatsButtonClick() {
-    return typeof this._onUpdate === `function` && this._onUpdate();
-  }
-
   get template() {
     return `<div class="statistic__item statistic__item--${this._title.toLowerCase()}">
     <canvas class="statistic__${this._title.toLowerCase()}" width="900"></canvas>
   </div>`;
+  }
+
+  _onStatsButtonClick() {
+    return typeof this._onUpdate === `function` && this._onUpdate();
   }
 
   bind() {

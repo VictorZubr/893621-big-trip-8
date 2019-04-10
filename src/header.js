@@ -10,22 +10,6 @@ export default class Header extends Component {
     this._total = data.total;
   }
 
-  static getFormattedDate(ms) {
-    const date = new Date(ms);
-    return `${date.toLocaleString(`en-US`, {month: `long`})} ${date.toLocaleString(`en-US`, {day: `2-digit`})}`;
-  }
-
-  static getSecondFormattedDate(begin, end) {
-    const date = new Date(end);
-    return (new Date(begin).getMonth() === date.getMonth()) ? `${date.toLocaleString(`en-US`, {day: `2-digit`})}` : Header.getFormattedDate(end);
-  }
-
-  _partialUpdate() {
-    this.unbind();
-    this._element.innerHTML = createComponentElement(this.template).innerHTML;
-    this.bind();
-  }
-
   get template() {
     return `<section class="trip">
             <div class="trip__schedule">
@@ -44,5 +28,21 @@ export default class Header extends Component {
     this._dateEnd = data.dateEnd;
     this._total = data.total;
     this._partialUpdate();
+  }
+
+  _partialUpdate() {
+    this.unbind();
+    this._element.innerHTML = createComponentElement(this.template).innerHTML;
+    this.bind();
+  }
+
+  static getFormattedDate(ms) {
+    const date = new Date(ms);
+    return `${date.toLocaleString(`en-US`, {month: `long`})} ${date.toLocaleString(`en-US`, {day: `2-digit`})}`;
+  }
+
+  static getSecondFormattedDate(begin, end) {
+    const date = new Date(end);
+    return (new Date(begin).getMonth() === date.getMonth()) ? `${date.toLocaleString(`en-US`, {day: `2-digit`})}` : Header.getFormattedDate(end);
   }
 }
