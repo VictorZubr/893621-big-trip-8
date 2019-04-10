@@ -26,10 +26,6 @@ export default class TripDay extends Component {
     </section>`;
   }
 
-  get number() {
-    return this._number;
-  }
-
   get itemsElement() {
     return this._element.querySelector(`.trip-day__items`);
   }
