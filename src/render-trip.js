@@ -17,6 +17,7 @@ const eventOnEdit = (event, eventEdit, eventsContainer) => {
 };
 
 const updateTripData = (tripData, destinations) => {
+  tripData.events = tripData.events.sort((a, b) => a.dateBegin - b.dateBegin);
   const route = tripData.events.map((it) => it.title);
   tripData.events.forEach((it) => {
     it.tripRoute = route;
@@ -25,6 +26,8 @@ const updateTripData = (tripData, destinations) => {
   tripData.title = route.join(` - `);
   tripData.route = route;
   tripData.total = getTotal(tripData.events);
+  tripData.dateBegin = tripData.events[0].dateBegin;
+  tripData.dateEnd = tripData.events[tripData.events.length - 1].dateEnd;
   return tripData;
 };
 

@@ -4,10 +4,7 @@ export default class Filter extends Component {
   constructor(data) {
     super();
     this._label = data.label;
-    this._count = null;
-
     this._onFilter = null;
-
     this._state = {
       isChecked: data.isChecked
     };

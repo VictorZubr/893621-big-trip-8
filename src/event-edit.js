@@ -1,5 +1,6 @@
 import {ADDITIONAL_POINTS, POINT_TYPES, SHAKE_TIME} from './const';
 import Component from './component';
+import Event from './event';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
 import {createComponentElement, shake} from './utils';
@@ -41,26 +42,22 @@ export default class EventEdit extends Component {
     this._onDeleteButtonClickBound = this._onDeleteButtonClick.bind(this);
     this._onChangeDestinationBound = this._onDestinationChange.bind(this);
     this._onEscKeyupBound = this._onEscKeyup.bind(this);
-    this._onPriceInputBound = this._getOnlyDigits.bind(this);
+    this._onPriceInputBound = EventEdit.getOnlyDigits.bind(this);
   }
 
-  _getFormattedDate(ms) {
+  static getFormattedDate(ms) {
     return moment(ms).format(`MMMM DD`);
   }
 
-  _getFormattedTime(ms) {
-    return moment(ms).format(`HH:MM`);
-  }
-
-  _getOfferValue(offer) {
+  static getOfferValue(offer) {
     return offer.toLowerCase().replace(/\s/g, `-`);
   }
 
   _getOffersHTML() {
     return this._offers
       .map((element) =>
-        ` <input class="point__offers-input visually-hidden" type="checkbox" id="${this._getOfferValue(element.name)}-${this._index}" name="offer" value="${this._getOfferValue(element.name)}"${element.checked ? ` checked` : ``}>
-          <label for="${this._getOfferValue(element.name)}-${this._index}" class="point__offers-label">
+        ` <input class="point__offers-input visually-hidden" type="checkbox" id="${EventEdit.getOfferValue(element.name)}-${this._index}" name="offer" value="${EventEdit.getOfferValue(element.name)}"${element.checked ? ` checked` : ``}>
+          <label for="${EventEdit.getOfferValue(element.name)}-${this._index}" class="point__offers-label">
             <span class="point__offer-service">${element.name}</span> + €<span class="point__offer-price">${element.price}</span>
           </label>`)
       .join(``);
@@ -96,7 +93,7 @@ export default class EventEdit extends Component {
     <header class="point__header">
       <label class="point__date">
         choose day
-        <input class="point__input" type="text" placeholder="${this._getFormattedDate(this._dateBegin)}" name="day" value="${this._getFormattedDate(this._dateBegin)}">
+        <input class="point__input" type="text" placeholder="${EventEdit.getFormattedDate(this._dateBegin)}" name="day" value="${EventEdit.getFormattedDate(this._dateBegin)}">
       </label>
 
       <div class="travel-way">
@@ -120,8 +117,8 @@ export default class EventEdit extends Component {
       </div>
       <div class="point__time">
         choose time
-        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateBegin)}" name="date-start" placeholder="${(moment(this._dateBegin).isValid()) ? this._getFormattedTime(this._dateBegin) : this._getFormattedTime(Date.now())} —">
-        <input class="point__input" type="text" value="${this._getFormattedTime(this._dateEnd)}" name="date-end" placeholder="${(moment(this._dateEnd).isValid()) ? this._getFormattedTime(this._dateEnd) : this._getFormattedTime(Date.now())}">
+        <input class="point__input" type="text" value="${Event.getFormattedTime(this._dateBegin)}" name="date-start" placeholder="${(moment(this._dateBegin).isValid()) ? Event.getFormattedTime(this._dateBegin) : Event.getFormattedTime(Date.now())} —">
+        <input class="point__input" type="text" value="${Event.getFormattedTime(this._dateEnd)}" name="date-end" placeholder="${(moment(this._dateEnd).isValid()) ? Event.getFormattedTime(this._dateEnd) : Event.getFormattedTime(Date.now())}">
       </div>
 
       <label class="point__price">
@@ -136,8 +133,8 @@ export default class EventEdit extends Component {
       </div>
 
       <div class="paint__favorite-wrap">
-        <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite" ${this._isFavorite ? `checked` : ``}>
-        <label class="point__favorite" for="favorite">favorite</label>
+        <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite-${this._index}" name="favorite" ${this._isFavorite ? `checked` : ``}>
+        <label class="point__favorite" for="favorite-${this._index}">favorite</label>
       </div>
     </header>
 
@@ -219,7 +216,7 @@ export default class EventEdit extends Component {
     return dataEntry;
   }
 
-  _markAsError(elementForStyle, elementForFocus = elementForStyle) {
+  static markAsError(elementForStyle, elementForFocus = elementForStyle) {
     elementForStyle.style = ERROR_STYLE;
     elementForFocus.focus();
     return false;
@@ -227,16 +224,16 @@ export default class EventEdit extends Component {
 
   _isValidForm() {
     if (this._destinations.findIndex((it) => it.name === this._destinationElement.value) < 0) {
-      return this._markAsError(this._destinationElement);
+      return EventEdit.markAsError(this._destinationElement);
     }
     if (typeof this._dateBegin === `undefined` || !moment(this._dateBegin).isValid()) {
-      return this._markAsError(this._dateBeginFlatpickr.altInput, this._dateBeginElement);
+      return EventEdit.markAsError(this._dateBeginFlatpickr.altInput, this._dateBeginElement);
     }
     if (typeof this._dateEnd === `undefined` || !moment(this._dateEnd).isValid()) {
-      return this._markAsError(this._dateEndFlatpickr.altInput, this._dateEndElement);
+      return EventEdit.markAsError(this._dateEndFlatpickr.altInput, this._dateEndElement);
     }
     if (isNaN(this._priceInputElement.value) || Number(this._priceInputElement.value) < 0) {
-      return this._markAsError(this._priceInputElement);
+      return EventEdit.markAsError(this._priceInputElement);
     }
     return true;
   }
@@ -278,7 +275,7 @@ export default class EventEdit extends Component {
     }
   }
 
-  _getOnlyDigits(evt) {
+  static getOnlyDigits(evt) {
     evt.target.value = evt.target.value.replace(/\D+/g, ``);
   }
 
@@ -296,6 +293,10 @@ export default class EventEdit extends Component {
 
   set onReset(fn) {
     this._onReset = fn;
+  }
+
+  set index(num) {
+    this._index = num;
   }
 
   bind() {

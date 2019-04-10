@@ -58,14 +58,14 @@ export default class API {
       .then(ModelOffers.parseOffers);
   }
 
-  _blockEventEdit(element) {
+  static blockEventEdit(element) {
     element.style = ``;
     element.querySelector(`.point__destination-input`).disabled = true;
     element.querySelector(`.point__button--save`).disabled = true;
     element.querySelector(`[type='reset']`).disabled = true;
   }
 
-  _unBlockEventEdit(element) {
+  static unBlockEventEdit(element) {
     element.querySelector(`[type='reset']`).disabled = false;
     element.querySelector(`.point__button--save`).disabled = false;
     element.querySelector(`.point__destination-input`).disabled = false;
@@ -74,7 +74,7 @@ export default class API {
 
   updateEvent({id: id, data}, element) {
     element.querySelector(`.point__button--save`).textContent = ButtonText.SAVING;
-    this._blockEventEdit(element);
+    API.blockEventEdit(element);
     return this._load({
       url: `points/${id}`,
       method: Method.PUT,
@@ -86,7 +86,7 @@ export default class API {
       .catch((err) => {
         setTimeout(() => {
           shake(element, SHAKE_TIME);
-          this._unBlockEventEdit(element);
+          API.unBlockEventEdit(element);
           element.querySelector(`.point__button--save`).textContent = ButtonText.SAVE;
         }, SHAKE_TIME);
         throw err;
@@ -96,11 +96,11 @@ export default class API {
 
   deleteEvent({id}, element) {
     element.querySelector(`[type='reset']`).textContent = ButtonText.DELETING;
-    this._blockEventEdit(element);
+    API.blockEventEdit(element);
     return this._load({url: `points/${id}`, method: Method.DELETE})
       .catch((err) => {
         shake(element, SHAKE_TIME);
-        this._unBlockEventEdit(element);
+        API.unBlockEventEdit(element);
         element.querySelector(`[type='reset']`).textContent = ButtonText.DELETE;
         throw err;
       });
@@ -117,7 +117,7 @@ export default class API {
       .catch((err) => {
         setTimeout(() => {
           shake(element, SHAKE_TIME);
-          this._unBlockEventEdit(element);
+          API.unBlockEventEdit(element);
           element.querySelector(`.point__button--save`).textContent = ButtonText.SAVE;
         }, SHAKE_TIME);
         throw err;

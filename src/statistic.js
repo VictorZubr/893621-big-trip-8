@@ -13,7 +13,6 @@ export default class Statistic extends Component {
     this._chart = null;
     this._statsButtonElement = null;
     this._onStatsButtonClickBound = this._onStatsButtonClick.bind(this);
-
   }
 
   _onStatsButtonClick() {

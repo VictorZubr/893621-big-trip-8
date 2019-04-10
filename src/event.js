@@ -16,19 +16,19 @@ export default class Event extends Component {
     this._onEditButtonClickBound = this._onEditButtonClick.bind(this);
   }
 
-  _getFormattedDuration(ms) {
+  static getFormattedDuration(ms) {
     const days = moment.duration(ms).days();
     const months = moment.duration(ms).months();
     const years = moment.duration(ms).years();
     return `${years > 0 ? years + `Y ` : ``}${months > 0 ? months + `M ` : ``}${days > 0 ? days + `D ` : ``}${moment.duration(ms).hours()}H ${moment.duration(ms).minutes()}M`;
   }
 
-  _getFormattedTime(ms) {
+  static getFormattedTime(ms) {
     return moment(ms).format(`HH:mm`);
   }
 
-  _getFormattedTimetable(dateBegin, dateEnd) {
-    return `${this._getFormattedTime(dateBegin)}&nbsp;&mdash; ${this._getFormattedTime(dateEnd)}`;
+  static getFormattedTimetable(dateBegin, dateEnd) {
+    return `${Event.getFormattedTime(dateBegin)}&nbsp;&mdash; ${Event.getFormattedTime(dateEnd)}`;
   }
 
   _getOffersHTML() {
@@ -51,9 +51,9 @@ export default class Event extends Component {
           <i class="trip-icon">${this._type.icon}</i>
           <h3 class="trip-point__title">${this._title}</h3>
           <p class="trip-point__schedule">
-            <span class="trip-point__timetable">${this._getFormattedTimetable(this._dateBegin, this._dateEnd)}</span>
+            <span class="trip-point__timetable">${Event.getFormattedTimetable(this._dateBegin, this._dateEnd)}</span>
             <span class="trip-point__duration">
-                ${this._getFormattedDuration(this._dateEnd - this._dateBegin)}
+                ${Event.getFormattedDuration(this._dateEnd - this._dateBegin)}
             </span>
           </p>
           <p class="trip-point__price">&euro;&nbsp;${this._price}</p>

@@ -1,5 +1,3 @@
-import ModelEvent from './model-event';
-
 export default class ModelNewEvent {
   constructor(data) {
     this.type = data.type;
@@ -28,13 +26,5 @@ export default class ModelNewEvent {
       'date_from': this.dateBegin,
       'date_to': this.dateEnd
     };
-  }
-
-  static parseNewEvent(data) {
-    return new ModelEvent(data);
-  }
-
-  static parseEvents(data) {
-    return data.map(ModelEvent.parseEvent);
   }
 }
