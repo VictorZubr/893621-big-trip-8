@@ -45,48 +45,6 @@ export default class EventEdit extends Component {
     this._onPriceInputBound = EventEdit.getOnlyDigits.bind(this);
   }
 
-  static getFormattedDate(ms) {
-    return moment(ms).format(`MMMM DD`);
-  }
-
-  static getOfferValue(offer) {
-    return offer.toLowerCase().replace(/\s/g, `-`);
-  }
-
-  _getOffersHTML() {
-    return this._offers
-      .map((element) =>
-        ` <input class="point__offers-input visually-hidden" type="checkbox" id="${EventEdit.getOfferValue(element.name)}-${this._index}" name="offer" value="${EventEdit.getOfferValue(element.name)}"${element.checked ? ` checked` : ``}>
-          <label for="${EventEdit.getOfferValue(element.name)}-${this._index}" class="point__offers-label">
-            <span class="point__offer-service">${element.name}</span> + €<span class="point__offer-price">${element.price}</span>
-          </label>`)
-      .join(``);
-  }
-
-  _getDestinationsHTML() {
-    return Array.from(new Set(this._destinations.map((it) => it.name))).concat(ADDITIONAL_POINTS).map((element) => `<option value="${element}"></option>`).join(``);
-  }
-
-  _getDescriptionHTML() {
-    return Array.from(this._photos).map((element) => `<img src="${element}" alt="picture from place" class="point__destination-image">`).join(``);
-  }
-
-  _getTravelWaySelectHTML() {
-    const result = POINT_TYPES.sort((a, b) => a.group < b.group);
-    result.forEach((element, index, array) => {
-      element.oldGroup = index === 0 || element.group === array[index - 1].group;
-    });
-    return result.map((element) =>
-      `${!element.oldGroup ? `</div><div class="travel-way__select-group">` : ``}
-       <input class="travel-way__select-input visually-hidden"
-            type="radio"
-            id="travel-way-${element.name}-${this._index}"
-            name="travel-way"
-            value="${element.name}">
-       <label class="travel-way__select-label" for="travel-way-${element.name}-${this._index}">${element.icon} ${element.name}</label>`
-    ).join(``);
-  }
-
   get template() {
     return `<article class="point">
   <form action="" method="get">
@@ -161,34 +119,68 @@ export default class EventEdit extends Component {
 </article>`;
   }
 
-  _onDestinationChange(evt) {
-    const destination = this._destinations.find((it) => it.name === evt.target.value);
-    if (typeof destination !== `undefined`) {
-      this._title = destination.name;
-      this._destination = destination.description;
-      this._photos = destination.pictures.map((it) => it.src);
-      this._partialUpdate();
-    } else {
-      evt.target.value = this._title;
-    }
+  set onEsc(fn) {
+    this._onEsc = fn;
   }
 
-  _onFormChange(evt) {
-    if (evt.target.name === `travel-way`) {
-      this._type = POINT_TYPES.find((element) => element.name === evt.target.value);
-      this._formElement.querySelector(`.point__destination-label`).innerText = this._type.text;
-      this._formElement.querySelector(`.travel-way__label`).innerText = this._type.icon;
-      this._travelWayToggleElement.click();
-      if (typeof this._type.offers !== `undefined`) {
-        this._offers = this._type.offers.map((it) => {
-          it.checked = false;
-          return it;
-        });
-      } else {
-        this._offers = [];
-      }
-      this._partialUpdate();
-    }
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
+  set onSubmit(fn) {
+    this._onSubmit = fn;
+  }
+
+  set onReset(fn) {
+    this._onReset = fn;
+  }
+
+  set index(num) {
+    this._index = num;
+  }
+
+  update(data) {
+    this._type = data.type;
+    this._title = data.title;
+    this._offers = data.offers.slice(0);
+    this._price = data.price;
+    this._isFavorite = data.isFavorite;
+    this._dateBegin = data.dateBegin;
+    this._dateEnd = data.dateEnd;
+  }
+
+  _getOffersHTML() {
+    return this._offers
+      .map((element) =>
+        ` <input class="point__offers-input visually-hidden" type="checkbox" id="${EventEdit.getOfferValue(element.name)}-${this._index}" name="offer" value="${EventEdit.getOfferValue(element.name)}"${element.checked ? ` checked` : ``}>
+          <label for="${EventEdit.getOfferValue(element.name)}-${this._index}" class="point__offers-label">
+            <span class="point__offer-service">${element.name}</span> + €<span class="point__offer-price">${element.price}</span>
+          </label>`)
+      .join(``);
+  }
+
+  _getDestinationsHTML() {
+    return Array.from(new Set(this._destinations.map((it) => it.name))).concat(ADDITIONAL_POINTS).map((element) => `<option value="${element}"></option>`).join(``);
+  }
+
+  _getDescriptionHTML() {
+    return Array.from(this._photos).map((element) => `<img src="${element}" alt="picture from place" class="point__destination-image">`).join(``);
+  }
+
+  _getTravelWaySelectHTML() {
+    const result = POINT_TYPES.sort((a, b) => a.group < b.group);
+    result.forEach((element, index, array) => {
+      element.oldGroup = index === 0 || element.group === array[index - 1].group;
+    });
+    return result.map((element) =>
+      `${!element.oldGroup ? `</div><div class="travel-way__select-group">` : ``}
+       <input class="travel-way__select-input visually-hidden"
+            type="radio"
+            id="travel-way-${element.name}-${this._index}"
+            name="travel-way"
+            value="${element.name}">
+       <label class="travel-way__select-label" for="travel-way-${element.name}-${this._index}">${element.icon} ${element.name}</label>`
+    ).join(``);
   }
 
   _processForm(formData) {
@@ -216,12 +208,6 @@ export default class EventEdit extends Component {
     return dataEntry;
   }
 
-  static markAsError(elementForStyle, elementForFocus = elementForStyle) {
-    elementForStyle.style = ERROR_STYLE;
-    elementForFocus.focus();
-    return false;
-  }
-
   _isValidForm() {
     if (this._destinations.findIndex((it) => it.name === this._destinationElement.value) < 0) {
       return EventEdit.markAsError(this._destinationElement);
@@ -238,65 +224,38 @@ export default class EventEdit extends Component {
     return true;
   }
 
-  _onFormSubmit(evt) {
-    evt.preventDefault();
-    if (!this._isValidForm()) {
-      shake(this._element, SHAKE_TIME);
-      return false;
-    }
-
-    const formData = new FormData(this._formElement);
-    const newData = this._processForm(formData);
-
-    [newData.dateBegin, newData.dateEnd] =
-      [newData.dateBegin, newData.dateEnd]
-      .map((element) => (!moment(element).isValid() || element === 0 || typeof element === `undefined`) ? Date.now() : element);
-
-    if (typeof newData.type === `undefined`) {
-      newData.type = this._type;
-    }
-
-    this.update(newData);
-    return typeof this._onSubmit === `function` && this._onSubmit(newData);
+  _partialUpdate() {
+    this.unbind();
+    this._element.innerHTML = createComponentElement(this.template).innerHTML;
+    this.bind();
   }
 
-  _onFormReset(evt) {
-    evt.preventDefault();
-    return typeof this._onReset === `function` && this._onReset();
-  }
-
-  _onEscKeyup(evt) {
-    return (typeof this._onEsc === `function`) && (evt.keyCode === 27) && this._onEsc();
-  }
-
-  _onDeleteButtonClick() {
-    if (typeof this._onDelete === `function`) {
-      this._onDelete(this._id);
-    }
-  }
-
-  static getOnlyDigits(evt) {
-    evt.target.value = evt.target.value.replace(/\D+/g, ``);
-  }
-
-  set onEsc(fn) {
-    this._onEsc = fn;
-  }
-
-  set onDelete(fn) {
-    this._onDelete = fn;
-  }
-
-  set onSubmit(fn) {
-    this._onSubmit = fn;
-  }
-
-  set onReset(fn) {
-    this._onReset = fn;
-  }
-
-  set index(num) {
-    this._index = num;
+  _createMapper(target) {
+    return {
+      'travel-way': (value) => {
+        target.type = POINT_TYPES.find((element) => element.name === value);
+      },
+      'destination': (value) => {
+        target.title = value;
+      },
+      'date-start': (value) => {
+        target.dateBegin += +moment(value, `DD MM YYYY hh:mm a`);
+      },
+      'date-end': (value) => {
+        target.dateEnd += +moment(value, `DD MM YYYY hh:mm a`);
+      },
+      'price': (value) => {
+        target.price = +value;
+      },
+      'favorite': (value) => {
+        target.isFavorite = value === `on`;
+      },
+      'offer': (value) => {
+        target.offers.forEach((element) => {
+          element.checked = element.checked || element.name.split(` `).join(`-`).toLowerCase() === value;
+        });
+      },
+    };
   }
 
   bind() {
@@ -381,47 +340,89 @@ export default class EventEdit extends Component {
     document.removeEventListener(`keyup`, this._onEscKeyupBound);
   }
 
-  update(data) {
-    this._type = data.type;
-    this._title = data.title;
-    this._offers = data.offers.slice(0);
-    this._price = data.price;
-    this._isFavorite = data.isFavorite;
-    this._dateBegin = data.dateBegin;
-    this._dateEnd = data.dateEnd;
+  _onFormSubmit(evt) {
+    evt.preventDefault();
+    if (!this._isValidForm()) {
+      shake(this._element, SHAKE_TIME);
+      return false;
+    }
+
+    const formData = new FormData(this._formElement);
+    const newData = this._processForm(formData);
+
+    [newData.dateBegin, newData.dateEnd] =
+      [newData.dateBegin, newData.dateEnd]
+        .map((element) => (!moment(element).isValid() || element === 0 || typeof element === `undefined`) ? Date.now() : element);
+
+    if (typeof newData.type === `undefined`) {
+      newData.type = this._type;
+    }
+
+    this.update(newData);
+    return typeof this._onSubmit === `function` && this._onSubmit(newData);
   }
 
-  _partialUpdate() {
-    this.unbind();
-    this._element.innerHTML = createComponentElement(this.template).innerHTML;
-    this.bind();
+  _onFormReset(evt) {
+    evt.preventDefault();
+    return typeof this._onReset === `function` && this._onReset();
   }
 
-  _createMapper(target) {
-    return {
-      'travel-way': (value) => {
-        target.type = POINT_TYPES.find((element) => element.name === value);
-      },
-      'destination': (value) => {
-        target.title = value;
-      },
-      'date-start': (value) => {
-        target.dateBegin += +moment(value, `DD MM YYYY hh:mm a`);
-      },
-      'date-end': (value) => {
-        target.dateEnd += +moment(value, `DD MM YYYY hh:mm a`);
-      },
-      'price': (value) => {
-        target.price = +value;
-      },
-      'favorite': (value) => {
-        target.isFavorite = value === `on`;
-      },
-      'offer': (value) => {
-        target.offers.forEach((element) => {
-          element.checked = element.checked || element.name.split(` `).join(`-`).toLowerCase() === value;
+  _onEscKeyup(evt) {
+    return (typeof this._onEsc === `function`) && (evt.keyCode === 27) && this._onEsc();
+  }
+
+  _onDeleteButtonClick() {
+    if (typeof this._onDelete === `function`) {
+      this._onDelete(this._id);
+    }
+  }
+
+  _onDestinationChange(evt) {
+    const destination = this._destinations.find((it) => it.name === evt.target.value);
+    if (typeof destination !== `undefined`) {
+      this._title = destination.name;
+      this._destination = destination.description;
+      this._photos = destination.pictures.map((it) => it.src);
+      this._partialUpdate();
+    } else {
+      evt.target.value = this._title;
+    }
+  }
+
+  _onFormChange(evt) {
+    if (evt.target.name === `travel-way`) {
+      this._type = POINT_TYPES.find((element) => element.name === evt.target.value);
+      this._formElement.querySelector(`.point__destination-label`).innerText = this._type.text;
+      this._formElement.querySelector(`.travel-way__label`).innerText = this._type.icon;
+      this._travelWayToggleElement.click();
+      if (typeof this._type.offers !== `undefined`) {
+        this._offers = this._type.offers.map((it) => {
+          it.checked = false;
+          return it;
         });
-      },
-    };
+      } else {
+        this._offers = [];
+      }
+      this._partialUpdate();
+    }
   }
+
+  static getFormattedDate(ms) {
+    return moment(ms).format(`MMMM DD`);
+  }
+
+  static getOfferValue(offer) {
+    return offer.toLowerCase().replace(/\s/g, `-`);
+  }
+
+  static getOnlyDigits(evt) {
+    evt.target.value = evt.target.value.replace(/\D+/g, ``);
+  }
+
+  static markAsError(elementForStyle, elementForFocus = elementForStyle) {
+    elementForStyle.style = ERROR_STYLE;
+    elementForFocus.focus();
+    return false;
+  }
+
 }

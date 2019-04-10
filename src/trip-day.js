@@ -8,10 +8,6 @@ export default class TripDay extends Component {
     this._date = data.date;
   }
 
-  _getFormattedDate() {
-    return moment(this._date).format(`MMM DD`);
-  }
-
   get template() {
     return `<section class="trip-day">
       <article class="trip-day__info">
@@ -28,5 +24,9 @@ export default class TripDay extends Component {
 
   get itemsElement() {
     return this._element.querySelector(`.trip-day__items`);
+  }
+
+  _getFormattedDate() {
+    return moment(this._date).format(`MMM DD`);
   }
 }
