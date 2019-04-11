@@ -395,14 +395,11 @@ export default class EventEdit extends Component {
       this._formElement.querySelector(`.point__destination-label`).innerText = this._type.text;
       this._formElement.querySelector(`.travel-way__label`).innerText = this._type.icon;
       this._travelWayToggleElement.click();
-      if (typeof this._type.offers !== `undefined`) {
-        this._offers = this._type.offers.map((it) => {
+      this._offers = (typeof this._type.offers === `undefined`) ? [] :
+        this._type.offers.map((it) => {
           it.checked = false;
           return it;
         });
-      } else {
-        this._offers = [];
-      }
       this._partialUpdate();
     }
   }

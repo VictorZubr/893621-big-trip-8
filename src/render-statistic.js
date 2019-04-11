@@ -46,7 +46,10 @@ const getStatisticData = (events, pointTypes) => {
     .map((type) => events
       .filter((it) => !it.isDeleted)
       .reduce(([sum, count], event) => {
-        [sum, count] = (event.type.name === type.name) ? [sum += getPrice(event), count += 1] : [sum, count];
+        // За один проход формируем два значения для статистики
+        const [sumAdd, countAdd] = (event.type.name === type.name) ? [getPrice(event), 1] : [0, 0];
+        sum += sumAdd;
+        count += countAdd;
         return [sum, count];
       }, [0, 0])
     );
