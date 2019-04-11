@@ -99,7 +99,7 @@ let header;
 
 tripContainer.innerHTML = WAIT_TEXT;
 
-const AUTHORIZATION = `Basic y3uu824638d0z048szh56sh`;
+const AUTHORIZATION = `Basic VZzh56sh`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
@@ -113,7 +113,9 @@ Promise.all([api.getOffers(), api.getDestinations(), api.getEvents()])
     renderTrip(filteredTrip, header, tripContainer, destinations, Sort.EVENT);
     renderStatistic(filteredTrip, header, statisticContainer);
   })
-  .catch(tripContainer.innerHTML = LOAD_ERROR_TEXT);
+  .catch(() => {
+    tripContainer.innerHTML = LOAD_ERROR_TEXT;
+  });
 
 const tableButtonElement = document.querySelector(`nav.trip-controls__menus a:first-child`);
 const statsButtonElement = document.querySelector(`nav.trip-controls__menus a:nth-child(2)`);

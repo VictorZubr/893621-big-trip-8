@@ -168,7 +168,7 @@ export default class EventEdit extends Component {
   }
 
   _getTravelWaySelectHTML() {
-    const result = POINT_TYPES.sort((a, b) => a.group < b.group);
+    const result = POINT_TYPES.sort((a, b) => a.group - b.group);
     result.forEach((element, index, array) => {
       element.oldGroup = index === 0 || element.group === array[index - 1].group;
     });
