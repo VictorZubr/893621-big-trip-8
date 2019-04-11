@@ -23,7 +23,6 @@ export default class Header extends Component {
 
   update(data) {
     this._title = data.title;
-    this._route = data.route;
     this._dateBegin = data.dateBegin;
     this._dateEnd = data.dateEnd;
     this._total = data.total;

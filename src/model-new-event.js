@@ -13,7 +13,6 @@ export default class ModelNewEvent {
 
   toRAW() {
     return {
-      'id': this.id,
       'type': this.type.name,
       'destination': {
         name: this.title,
