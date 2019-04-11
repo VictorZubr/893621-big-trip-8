@@ -30,9 +30,9 @@ export default class Header extends Component {
   }
 
   _partialUpdate() {
-    this.unbind();
-    this._element.innerHTML = createComponentElement(this.template).innerHTML;
-    this.bind();
+    const tempElement = createComponentElement(this.template);
+    this._element.parentNode.replaceChild(tempElement, this._element);
+    this._element = tempElement;
   }
 
   static getFormattedDate(ms) {

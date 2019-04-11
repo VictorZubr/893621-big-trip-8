@@ -53,7 +53,7 @@ const getStatisticData = (events, pointTypes) => {
         return [sum, count];
       }, [0, 0])
     );
-  // Из массива пар значений [[X, Y], [X1, Y1]...] делаем два массива [X, X1,...] и [Y, Y1,...]
+  // Из массива пар значений [[X, Y], [X1, Y1]...] делаем два массива [[X, X1,...], [Y, Y1,...]]
   return [result.map((it) => it[0]), result.map((it) => it[1])];
 };
 
